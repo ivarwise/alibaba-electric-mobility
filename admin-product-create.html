@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Product – EVSource Admin</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              orange: '#FF6A00',
+              dark: '#E55A00',
+              navy: '#0F172A'
+            }
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .sidebar-link.active { background: rgba(255, 106, 0, 0.12); color: #FF6A00; }
+    .upload-zone {
+      border: 2px dashed #cbd5e1;
+      transition: all 0.2s;
+    }
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: #FF6A00;
+      background: #fff7ed;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-100 text-slate-800 antialiased">
+
+  <div class="flex min-h-screen">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 text-white transform -translate-x-full lg:translate-x-0 transition-transform duration-200">
+      <div class="flex flex-col h-full">
+        <div class="px-6 py-5 border-b border-slate-800">
+          <a href="admin-dashboard.html" class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-brand-orange flex items-center justify-center text-white font-black text-sm">EV</div>
+            <div>
+              <p class="font-bold text-white leading-none">EVSource</p>
+              <p class="text-[10px] text-slate-500">Admin Panel</p>
+            </div>
+          </a>
+        </div>
+
+        <nav class="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
+          <p class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Main</p>
+          <a href="admin-dashboard.html" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa-solid fa-chart-pie w-5 text-center"></i> Dashboard
+          </a>
+          <a href="admin-products.html" class="sidebar-link active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition">
+            <i class="fa-solid fa-box w-5 text-center"></i> Products
+          </a>
+          <a href="admin-suppliers.html" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa-solid fa-building w-5 text-center"></i> Suppliers
+          </a>
+          <a href="admin-orders.html" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa-solid fa-cart-shopping w-5 text-center"></i> Orders
+          </a>
+          <a href="admin-quotations.html" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa-solid fa-file-invoice w-5 text-center"></i> Quotations
+          </a>
+          <a href="admin-categories.html" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa-solid fa-tags w-5 text-center"></i> Categories
+          </a>
+        </nav>
+
+        <div class="px-4 py-4 border-t border-slate-800">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-brand-orange flex items-center justify-center text-sm font-bold" id="admin-avatar">A</div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold truncate" id="admin-name">Admin</p>
+              <p class="text-xs text-slate-500 truncate" id="admin-email">—</p>
+            </div>
+            <button id="logout-btn" class="text-slate-500 hover:text-red-400 transition">
+              <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="flex-1 lg:ml-64">
+
+      <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+        <div class="flex items-center justify-between px-4 sm:px-6 h-14">
+          <div class="flex items-center gap-3">
+            <button id="sidebar-toggle" class="lg:hidden text-slate-600 text-xl">
+              <i class="fa-solid fa-bars"></i>
+            </button>
+            <div>
+              <a href="admin-products.html" class="text-sm text-slate-500 hover:text-brand-orange">Products</a>
+              <span class="text-slate-300 mx-1.5">/</span>
+              <span class="text-sm font-semibold text-slate-900">Add Product</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="p-4 sm:p-6 lg:p-8 max-w-4xl">
+
+        <div class="mb-6">
+          <h1 class="text-2xl font-black text-slate-900">Add New Product</h1>
+          <p class="text-slate-500 text-sm mt-1">Upload photos and fill details. Only published products appear on the storefront.</p>
+        </div>
+
+        <div id="success-message" class="hidden mb-5 bg-emerald-50 border border-emerald-100 text-emerald-700 text-sm rounded-xl px-4 py-3">
+          <i class="fa-solid fa-circle-check mr-2"></i>
+          Product created successfully! Redirecting...
+        </div>
+        <div id="error-message" class="hidden mb-5 bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-4 py-3">
+          <i class="fa-solid fa-circle-exclamation mr-2"></i>
+          <span id="error-text">Something went wrong</span>
+        </div>
+
+        <form id="product-form" class="space-y-5">
+
+          <!-- Basic Info -->
+          <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 sm:p-6">
+            <h2 class="font-bold text-slate-900 mb-4">Basic Information</h2>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1.5">Product Title *</label>
+                <input id="title" type="text" required placeholder="e.g. Electric Mountain Bike 750W 48V"
+                       class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange">
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Supplier *</label>
+                  <select id="supplier_id" required
+                          class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange bg-white">
+                    <option value="">Select supplier</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Category *</label>
+                  <div class="flex gap-2">
+                    <select id="category_id" required
+                            class="flex-1 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange bg-white">
+                      <option value="">Select category</option>
+                    </select>
+                    <button type="button" id="add-category-btn"
+                            class="px-3 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition">
+                      + New
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- New Category -->
+              <div id="new-category-box" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-4">
+                <p class="text-sm font-semibold text-slate-800 mb-2">Create New Category</p>
+                <div class="flex gap-2">
+                  <input id="new-category-name" type="text" placeholder="e.g. Electric Scooters"
+                         class="flex-1 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20">
+                  <button type="button" id="save-category-btn"
+                          class="bg-brand-orange hover:bg-brand-dark text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition">
+                    Save
+                  </button>
+                  <button type="button" id="cancel-category-btn" class="text-slate-500 text-sm font-medium px-2">Cancel</button>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1.5">Short Description</label>
+                <input id="short_description" type="text" placeholder="One-line summary shown on cards"
+                       class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange">
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1.5">Full Description</label>
+                <textarea id="description" rows="4" placeholder="Detailed product description, specs, features..."
+                          class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange resize-none"></textarea>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Country of Origin</label>
+                  <input id="country" type="text" placeholder="e.g. China, Germany"
+                         class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Tags (comma separated)</label>
+                  <input id="tags" type="text" placeholder="e-bike, 750W, lithium"
+                         class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pricing & MOQ -->
+          <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 sm:p-6">
+            <h2 class="font-bold text-slate-900 mb-4">Pricing & MOQ</h2>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1.5">Min Price *</label>
+                <input id="price_min" type="number" required min="0" step="0.01" placeholder="0"
+                       class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1.5">Max Price</label>
+                <input id="price_max" type="number" min="0" step="0.01" placeholder="0"
+                       class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1.5">Currency</label>
+                <select id="currency" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange bg-white">
+                  <option value="USD">USD</option>
+                  <option value="EUR">EUR</option>
+                  <option value="CNY">CNY</option>
+                  <option value="NGN">NGN</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1.5">MOQ *</label>
+                <input id="moq" type="number" required min="1" value="1"
+                       class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange">
+              </div>
+            </div>
+          </div>
+
+          <!-- Photos -->
+          <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 sm:p-6">
+            <h2 class="font-bold text-slate-900 mb-1">Product Photos</h2>
+            <p class="text-xs text-slate-500 mb-4">Select multiple photos from gallery (up to 20). First photo = main image.</p>
+
+            <div id="upload-zone" class="upload-zone rounded-xl p-8 text-center cursor-pointer">
+              <input type="file" id="image-file" accept="image/*" multiple class="hidden">
+              <div id="upload-placeholder">
+                <div class="w-14 h-14 bg-orange-50 text-brand-orange rounded-full flex items-center justify-center mx-auto mb-3">
+                  <i class="fa-solid fa-images text-xl"></i>
+                </div>
+                <p class="text-sm font-semibold text-slate-800 mb-1">Tap to select from gallery</p>
+                <p class="text-xs text-slate-500">You can select multiple photos at once</p>
+                <p class="text-[11px] text-slate-400 mt-2">JPG, PNG, WEBP · Max 5MB each</p>
+              </div>
+            </div>
+
+            <div id="previews" class="mt-4 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 hidden"></div>
+
+            <div id="upload-progress" class="hidden mt-4">
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div id="progress-bar" class="bg-brand-orange h-2 rounded-full transition-all" style="width: 0%"></div>
+              </div>
+              <p class="text-xs text-slate-500 mt-1.5" id="progress-text">Uploading...</p>
+            </div>
+          </div>
+
+          <!-- Badges & Status -->
+          <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 sm:p-6">
+            <h2 class="font-bold text-slate-900 mb-4">Badges & Status</h2>
+
+            <div class="flex flex-wrap gap-4 mb-5">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="is_featured" class="w-4 h-4 rounded text-brand-orange focus:ring-brand-orange">
+                <span class="text-sm font-medium">Featured</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="is_hot" class="w-4 h-4 rounded text-brand-orange focus:ring-brand-orange">
+                <span class="text-sm font-medium">Hot</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="is_best_price" class="w-4 h-4 rounded text-brand-orange focus:ring-brand-orange">
+                <span class="text-sm font-medium">Best Price</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="is_top_seller" class="w-4 h-4 rounded text-brand-orange focus:ring-brand-orange">
+                <span class="text-sm font-medium">Top Seller</span>
+              </label>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Status *</label>
+              <div class="flex flex-wrap gap-4">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="status" value="draft" class="w-4 h-4 text-brand-orange focus:ring-brand-orange">
+                  <span class="text-sm font-medium">Draft</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="status" value="pending" class="w-4 h-4 text-brand-orange focus:ring-brand-orange">
+                  <span class="text-sm font-medium">Pending Review</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="status" value="published" checked class="w-4 h-4 text-brand-orange focus:ring-brand-orange">
+                  <span class="text-sm font-medium">Published (live on store)</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex flex-col sm:flex-row gap-3 pt-1">
+            <button type="submit" id="submit-btn"
+                    class="bg-brand-orange hover:bg-brand-dark text-white font-bold px-8 py-3.5 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20">
+              <span id="btn-text">Create Product</span>
+              <i id="btn-spinner" class="fa-solid fa-spinner fa-spin hidden"></i>
+            </button>
+            <a href="admin-products.html"
+               class="border border-slate-200 text-slate-700 font-semibold px-8 py-3.5 rounded-xl hover:bg-slate-50 transition text-center">
+              Cancel
+            </a>
+          </div>
+        </form>
+      </main>
+    </div>
+  </div>
+
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden"></div>
+
+  <script>
+    const SUPABASE_URL = "https://zgbdhpebmjokbaeflqhj.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_m5osddO3GFnJlQYIvSHS3Q_WqF72WwV";
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let selectedFiles = [];
+
+    // Sidebar toggle
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    document.getElementById('sidebar-toggle')?.addEventListener('click', () => {
+      sidebar.classList.toggle('-translate-x-full');
+      overlay.classList.toggle('hidden');
+    });
+    overlay?.addEventListener('click', () => {
+      sidebar.classList.add('-translate-x-full');
+      overlay.classList.add('hidden');
+    });
+
+    // Auth check (basic)
+    async function checkAuth() {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (!user) {
+        // Allow for now – remove this comment and redirect if you want strict auth
+        // window.location.href = 'admin-login.html';
+        return;
+      }
+      const { data: profile } = await supabaseClient
+        .from('profiles')
+        .select('full_name, role, email')
+        .eq('id', user.id)
+        .single();
+
+      const name = profile?.full_name || user.email?.split('@')[0] || 'Admin';
+      document.getElementById('admin-name').textContent = name;
+      document.getElementById('admin-email').textContent = user.email || '';
+      document.getElementById('admin-avatar').textContent = name.charAt(0).toUpperCase();
+    }
+
+    // Load suppliers
+    async function loadSuppliers() {
+      const select = document.getElementById('supplier_id');
+      const { data } = await supabaseClient
+        .from('suppliers')
+        .select('id, company_name')
+        .eq('is_active', true)
+        .order('company_name');
+
+      select.innerHTML = '<option value="">Select supplier</option>';
+      (data || []).forEach(s => {
+        select.innerHTML += `<option value="${s.id}">${s.company_name}</option>`;
+      });
+    }
+
+    // Load categories
+    async function loadCategories() {
+      const select = document.getElementById('category_id');
+      const { data } = await supabaseClient
+        .from('categories')
+        .select('id, name, slug')
+        .eq('is_active', true)
+        .order('sort_order');
+
+      select.innerHTML = '<option value="">Select category</option>';
+      (data || []).forEach(c => {
+        select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+      });
+    }
+
+    // New category
+    document.getElementById('add-category-btn').addEventListener('click', () => {
+      document.getElementById('new-category-box').classList.remove('hidden');
+      document.getElementById('new-category-name').focus();
+    });
+    document.getElementById('cancel-category-btn').addEventListener('click', () => {
+      document.getElementById('new-category-box').classList.add('hidden');
+      document.getElementById('new-category-name').value = '';
+    });
+    document.getElementById('save-category-btn').addEventListener('click', async () => {
+      const name = document.getElementById('new-category-name').value.trim();
+      if (!name) return alert('Enter a category name');
+      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      try {
+        const { data, error } = await supabaseClient
+          .from('categories')
+          .insert([{ name, slug, is_active: true, sort_order: 99 }])
+          .select()
+          .single();
+        if (error) throw error;
+        await loadCategories();
+        document.getElementById('category_id').value = data.id;
+        document.getElementById('new-category-box').classList.add('hidden');
+        document.getElementById('new-category-name').value = '';
+        alert('Category created! It will appear on the storefront.');
+      } catch (err) {
+        alert(err.message || 'Failed to create category');
+      }
+    });
+
+    // Image upload
+    const uploadZone = document.getElementById('upload-zone');
+    const fileInput = document.getElementById('image-file');
+    const previewsContainer = document.getElementById('previews');
+
+    uploadZone.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files || []).filter(f => f.type.startsWith('image/') && f.size <= 5 * 1024 * 1024);
+      selectedFiles = [...selectedFiles, ...files].slice(0, 20);
+      renderPreviews();
+      fileInput.value = '';
+    });
+
+    uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+    uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadZone.classList.remove('dragover');
+      const files = Array.from(e.dataTransfer.files || []).filter(f => f.type.startsWith('image/') && f.size <= 5 * 1024 * 1024);
+      selectedFiles = [...selectedFiles, ...files].slice(0, 20);
+      renderPreviews();
+    });
+
+    function renderPreviews() {
+      if (selectedFiles.length === 0) {
+        previewsContainer.classList.add('hidden');
+        previewsContainer.innerHTML = '';
+        return;
+      }
+      previewsContainer.classList.remove('hidden');
+      previewsContainer.innerHTML = selectedFiles.map((file, i) => {
+        const url = URL.createObjectURL(file);
+        return `
+          <div class="relative group aspect-square rounded-xl overflow-hidden border border-slate-200 bg-slate-50">
+            <img src="${url}" class="w-full h-full object-cover" alt="">
+            ${i === 0 ? '<span class="absolute top-1 left-1 bg-brand-orange text-white text-[9px] font-bold px-1.5 py-0.5 rounded">Main</span>' : ''}
+            <button type="button" onclick="removeImage(${i})" class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">×</button>
+          </div>`;
+      }).join('');
+    }
+
+    window.removeImage = function(index) {
+      selectedFiles.splice(index, 1);
+      renderPreviews();
+    };
+
+    async function uploadAllImages() {
+      if (selectedFiles.length === 0) return { main: null, all: [] };
+
+      document.getElementById('upload-progress').classList.remove('hidden');
+      const progressBar = document.getElementById('progress-bar');
+      const progressText = document.getElementById('progress-text');
+      const urls = [];
+
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
+        progressText.textContent = `Uploading photo ${i + 1} of ${selectedFiles.length}...`;
+        progressBar.style.width = `${Math.round((i / selectedFiles.length) * 100)}%`;
+
+        const ext = file.name.split('.').pop() || 'jpg';
+        const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const filePath = `products/${fileName}`;
+
+        const { error } = await supabaseClient.storage
+          .from('product-images')
+          .upload(filePath, file, { cacheControl: '3600', upsert: false });
+
+        if (error) throw error;
+
+        const { data: urlData } = supabaseClient.storage
+          .from('product-images')
+          .getPublicUrl(filePath);
+
+        urls.push(urlData.publicUrl);
+      }
+
+      progressBar.style.width = '100%';
+      progressText.textContent = 'All photos uploaded!';
+      return { main: urls[0] || null, all: urls };
+    }
+
+    function generateSlug(title) {
+      return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + Date.now().toString().slice(-4);
+    }
+
+    // Submit
+    document.getElementById('product-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const title = document.getElementById('title').value.trim();
+      const supplier_id = document.getElementById('supplier_id').value;
+      const category_id = document.getElementById('category_id').value;
+      const short_description = document.getElementById('short_description').value.trim();
+      const description = document.getElementById('description').value.trim();
+      const country = document.getElementById('country').value.trim();
+      const tagsRaw = document.getElementById('tags').value.trim();
+      const price_min = parseFloat(document.getElementById('price_min').value) || 0;
+      const price_max = parseFloat(document.getElementById('price_max').value) || null;
+      const currency = document.getElementById('currency').value;
+      const moq = parseInt(document.getElementById('moq').value) || 1;
+      const status = document.querySelector('input[name="status"]:checked')?.value || 'draft';
+      const is_featured = document.getElementById('is_featured').checked;
+      const is_hot = document.getElementById('is_hot').checked;
+      const is_best_price = document.getElementById('is_best_price').checked;
+      const is_top_seller = document.getElementById('is_top_seller').checked;
+
+      if (!supplier_id || !category_id) {
+        alert('Please select both supplier and category');
+        return;
+      }
+
+      const successBox = document.getElementById('success-message');
+      const errorBox = document.getElementById('error-message');
+      const btnText = document.getElementById('btn-text');
+      const btnSpinner = document.getElementById('btn-spinner');
+      const submitBtn = document.getElementById('submit-btn');
+
+      successBox.classList.add('hidden');
+      errorBox.classList.add('hidden');
+      btnText.textContent = 'Creating...';
+      btnSpinner.classList.remove('hidden');
+      submitBtn.disabled = true;
+
+      try {
+        // 1. Upload images
+        const { main, all } = await uploadAllImages();
+
+        // 2. Insert product
+        const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
+
+        const { data: product, error: productError } = await supabaseClient
+          .from('products')
+          .insert([{
+            supplier_id,
+            category_id,
+            title,
+            slug: generateSlug(title),
+            short_description: short_description || null,
+            description: description || null,
+            price_min,
+            price_max,
+            currency,
+            moq,
+            main_image_url: main,
+            images: all,
+            status,
+            is_featured,
+            is_hot,
+            is_best_price,
+            is_top_seller,
+            country: country || null,
+            tags,
+            published_at: status === 'published' ? new Date().toISOString() : null
+          }])
+          .select()
+          .single();
+
+        if (productError) throw productError;
+
+        // 3. Also insert into product_images table (optional but good)
+        if (all.length > 0) {
+          const rows = all.map((url, i) => ({
+            product_id: product.id,
+            url,
+            sort_order: i
+          }));
+          await supabaseClient.from('product_images').insert(rows);
+        }
+
+        successBox.classList.remove('hidden');
+        setTimeout(() => {
+          window.location.href = 'admin-products.html';
+        }, 1400);
+
+      } catch (err) {
+        console.error(err);
+        errorBox.classList.remove('hidden');
+        document.getElementById('error-text').textContent = err.message || 'Failed to create product';
+        btnText.textContent = 'Create Product';
+        btnSpinner.classList.add('hidden');
+        submitBtn.disabled = false;
+        document.getElementById('upload-progress').classList.add('hidden');
+      }
+    });
+
+    document.getElementById('logout-btn')?.addEventListener('click', async () => {
+      if (!confirm('Logout?')) return;
+      await supabaseClient.auth.signOut();
+      window.location.href = 'admin-login.html';
+    });
+
+    // Init
+    checkAuth();
+    loadSuppliers();
+    loadCategories();
+  </script>
+</body>
+</html>
