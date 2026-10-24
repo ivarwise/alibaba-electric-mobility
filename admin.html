@@ -22,6 +22,7 @@
 
   <main class="max-w-lg mx-auto px-4 py-5 space-y-5">
 
+    <!-- FORM -->
     <div class="bg-white rounded-2xl shadow-sm border p-5">
       <h2 id="formTitle" class="text-lg font-bold mb-4">Add New Product</h2>
 
@@ -57,7 +58,7 @@
 
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1">Category (type freely)</label>
-          <input type="text" id="categoryName" placeholder="Electric Bikes, Batteries..."
+          <input type="text" id="categoryName" placeholder="Electric Bikes, Batteries, Scooters..."
                  class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
         </div>
 
@@ -82,7 +83,7 @@
                     placeholder="Write full product details..."></textarea>
         </div>
 
-        <!-- ========== PHOTO SECTION (exact same method that worked) ========== -->
+        <!-- PHOTO SELECTOR - same method that worked in your test -->
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1">Photos (max 10)</label>
 
@@ -111,7 +112,7 @@
       </form>
     </div>
 
-    <!-- Products List -->
+    <!-- PRODUCTS LIST -->
     <div class="bg-white rounded-2xl shadow-sm border p-5">
       <div class="flex justify-between items-center mb-4">
         <h2 class="font-bold">Your Products</h2>
@@ -124,7 +125,6 @@
   </main>
 
   <script>
-    // Supabase
     const SUPABASE_URL = 'https://zgbdhpebmjokbaeflqhj.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_m5osddO3GFnJlQYIvSHS3Q_WqF72WwV';
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -140,9 +140,11 @@
     const submitBtn = document.getElementById('submitBtn');
     const cancelEdit = document.getElementById('cancelEdit');
 
-    // ========== PHOTO HANDLING (same as working test) ==========
+    // ========== PHOTO PREVIEW (exact method from working test) ==========
     imageInput.addEventListener('change', function () {
       const files = Array.from(this.files);
+
+      if (files.length === 0) return;
 
       photoStatus.textContent = files.length + ' photo(s) selected - loading previews...';
 
@@ -159,21 +161,21 @@
     function renderPreviews() {
       imagePreview.innerHTML = '';
       const total = existingImages.length + selectedFiles.length;
-      photoStatus.textContent = total + ' photo(s) selected';
+      photoStatus.textContent = total > 0 ? total + ' photo(s) selected' : '';
 
-      // Existing images
+      // Existing images (edit mode)
       existingImages.forEach((url, i) => {
         const div = document.createElement('div');
         div.className = 'relative';
         div.innerHTML = `
           <img src="${url}" class="preview-img border">
           <button type="button" onclick="removeExisting(${i})"
-                  class="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full text-xs">×</button>
+                  class="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full text-xs flex items-center justify-center">×</button>
         `;
         imagePreview.appendChild(div);
       });
 
-      // New files
+      // New selected files
       selectedFiles.forEach((file, i) => {
         const reader = new FileReader();
         reader.onload = function (e) {
@@ -182,12 +184,9 @@
           div.innerHTML = `
             <img src="${e.target.result}" class="preview-img border">
             <button type="button" onclick="removeNew(${i})"
-                    class="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full text-xs">×</button>
+                    class="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full text-xs flex items-center justify-center">×</button>
           `;
           imagePreview.appendChild(div);
-        };
-        reader.onerror = function () {
-          photoStatus.textContent = 'Error loading one of the photos';
         };
         reader.readAsDataURL(file);
       });
@@ -203,7 +202,7 @@
       renderPreviews();
     };
 
-    // ========== UPLOAD ==========
+    // ========== UPLOAD IMAGES ==========
     async function uploadImages() {
       const urls = [...existingImages];
 
@@ -216,7 +215,10 @@
           .from('product-images')
           .upload(path, file, { contentType: file.type });
 
-        if (error) throw new Error('Upload failed: ' + error.message);
+        if (error) {
+          console.error(error);
+          throw new Error('Image upload failed: ' + error.message);
+        }
 
         const { data } = supabase.storage.from('product-images').getPublicUrl(path);
         urls.push(data.publicUrl);
@@ -224,6 +226,7 @@
       return urls;
     }
 
+    // ========== HELPERS ==========
     async function getSupplierId() {
       const { data } = await supabase.from('suppliers').select('id').limit(1).maybeSingle();
       if (data) return data.id;
@@ -243,15 +246,23 @@
       if (!name || !name.trim()) return null;
       const clean = name.trim();
 
-      let { data } = await supabase.from('categories').select('id').ilike('name', clean).maybeSingle();
+      const { data } = await supabase
+        .from('categories')
+        .select('id')
+        .ilike('name', clean)
+        .maybeSingle();
+
       if (data) return data.id;
 
       const slug = clean.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-      const { data: newCat } = await supabase.from('categories').insert([{
-        name: clean, slug: slug, is_active: true
+      const { data: newCat, error } = await supabase.from('categories').insert([{
+        name: clean,
+        slug: slug,
+        is_active: true
       }]).select().single();
 
-      return newCat ? newCat.id : null;
+      if (error) return null;
+      return newCat.id;
     }
 
     // ========== SUBMIT ==========
@@ -297,7 +308,7 @@
 
         if (result.error) throw result.error;
 
-        alert(editingId ? 'Product updated!' : 'Product published successfully!');
+        alert(editingId ? 'Product updated successfully!' : 'Product published successfully!');
         resetForm();
         loadProducts();
 
@@ -310,14 +321,17 @@
       }
     });
 
-    // ========== LOAD / EDIT / DELETE ==========
+    // ========== LOAD PRODUCTS ==========
     async function loadProducts() {
       const { data, error } = await supabase
         .from('products')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) return console.error(error);
+      if (error) {
+        console.error(error);
+        return;
+      }
 
       const list = data || [];
       document.getElementById('productCount').textContent = list.length + ' products';
@@ -337,20 +351,21 @@
           <img src="${p.main_image_url || 'https://via.placeholder.com/80'}" class="w-16 h-16 object-cover rounded-xl">
           <div class="flex-1 min-w-0">
             <div class="font-semibold text-sm truncate">${p.title}</div>
-            <div class="text-xs text-gray-500">$${p.price_min || 0} - $${p.price_max || 0}</div>
+            <div class="text-xs text-gray-500 mt-0.5">$${p.price_min || 0} - $${p.price_max || 0}</div>
             <div class="text-xs mt-1 ${p.status === 'published' ? 'text-green-600' : 'text-gray-500'}">${p.status}</div>
-            <div class="flex gap-4 mt-1">
-              <button onclick="editProduct('${p.id}')" class="text-xs text-blue-600">Edit</button>
-              <button onclick="deleteProduct('${p.id}')" class="text-xs text-red-600">Delete</button>
+            <div class="flex gap-4 mt-1.5">
+              <button onclick="editProduct('${p.id}')" class="text-xs text-blue-600 font-medium">Edit</button>
+              <button onclick="deleteProduct('${p.id}')" class="text-xs text-red-600 font-medium">Delete</button>
             </div>
           </div>
         </div>
       `).join('');
     }
 
+    // ========== EDIT ==========
     window.editProduct = async function (id) {
       const { data, error } = await supabase.from('products').select('*').eq('id', id).single();
-      if (error || !data) return alert('Not found');
+      if (error || !data) return alert('Product not found');
 
       editingId = id;
       document.getElementById('formTitle').textContent = 'Edit Product';
@@ -399,8 +414,9 @@
       document.getElementById('moq').value = 1;
     }
 
+    // ========== DELETE ==========
     window.deleteProduct = async function (id) {
-      if (!confirm('Delete this product?')) return;
+      if (!confirm('Delete this product permanently?')) return;
       const { error } = await supabase.from('products').delete().eq('id', id);
       if (error) alert(error.message);
       else loadProducts();
