@@ -83,18 +83,25 @@
                     placeholder="Write full product details..."></textarea>
         </div>
 
-        <!-- PHOTO SELECTOR - same method that worked in your test -->
+        <!-- ========== PHOTO SELECTOR (iOS FIXED) ========== -->
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1">Photos (max 10)</label>
 
-          <label for="imageInput"
-                 class="block w-full border-2 border-dashed border-orange-400 rounded-2xl py-8 text-center bg-gray-50 cursor-pointer">
-            <div class="text-3xl mb-2">📷</div>
-            <div class="font-semibold text-gray-800">Tap to select photos</div>
-            <div class="text-xs text-gray-500 mt-1">You can select multiple</div>
-          </label>
+          <div class="relative">
+            <!-- Visible button -->
+            <div class="w-full border-2 border-dashed border-orange-400 rounded-2xl py-8 text-center bg-gray-50 pointer-events-none">
+              <div class="text-3xl mb-2">📷</div>
+              <div class="font-semibold text-gray-800">Tap to select photos</div>
+              <div class="text-xs text-gray-500 mt-1">You can select multiple</div>
+            </div>
 
-          <input type="file" id="imageInput" accept="image/*" multiple class="hidden">
+            <!-- Invisible file input covering the whole area -->
+            <input type="file" 
+                   id="imageInput" 
+                   accept="image/*" 
+                   multiple 
+                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+          </div>
 
           <div id="imagePreview" class="flex flex-wrap gap-2 mt-3"></div>
           <p id="photoStatus" class="text-sm text-gray-600 mt-2 font-medium"></p>
@@ -140,13 +147,16 @@
     const submitBtn = document.getElementById('submitBtn');
     const cancelEdit = document.getElementById('cancelEdit');
 
-    // ========== PHOTO PREVIEW (exact method from working test) ==========
-    imageInput.addEventListener('change', function () {
-      const files = Array.from(this.files);
+    // ========== PHOTO HANDLING (iOS FIXED) ==========
+    imageInput.addEventListener('change', function (e) {
+      const files = Array.from(e.target.files || []);
 
-      if (files.length === 0) return;
+      if (files.length === 0) {
+        photoStatus.textContent = 'No photos selected';
+        return;
+      }
 
-      photoStatus.textContent = files.length + ' photo(s) selected - loading previews...';
+      photoStatus.textContent = files.length + ' photo(s) selected - loading...';
 
       if (selectedFiles.length + existingImages.length + files.length > 10) {
         alert('Maximum 10 photos allowed');
@@ -163,7 +173,7 @@
       const total = existingImages.length + selectedFiles.length;
       photoStatus.textContent = total > 0 ? total + ' photo(s) selected' : '';
 
-      // Existing images (edit mode)
+      // Existing images (when editing)
       existingImages.forEach((url, i) => {
         const div = document.createElement('div');
         div.className = 'relative';
