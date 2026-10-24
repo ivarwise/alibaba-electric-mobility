@@ -3,20 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alibaba - Electric Mobility Marketplace</title>
-    
-    <!-- Tailwind CSS -->
+    <title>Global Trade Marketplace - Electric Mobility & Industrial Supplies</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <script>
         tailwind.config = {
             theme: {
@@ -64,32 +55,25 @@
     <!-- Main Header -->
     <header class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-            <!-- Logo -->
             <div class="flex items-center gap-8">
                 <a href="#" class="flex items-center">
                     <span class="text-2xl font-black italic tracking-tighter text-alibaba-orange">alibaba</span>
                     <span class="text-[10px] text-gray-500 font-medium ml-1 leading-tight hidden sm:inline">Global Trade Starts Here</span>
                 </a>
             </div>
-
-            <!-- Search Box -->
             <div class="flex-1 max-w-2xl hidden md:flex items-center">
                 <div class="relative flex items-center w-full border-2 border-alibaba-orange rounded-full overflow-hidden bg-white">
-                    <div class="pl-4 pr-2 text-gray-400">
-                        <i class="fa-solid fa-bars text-xs"></i>
-                    </div>
+                    <div class="pl-4 pr-2 text-gray-400"><i class="fa-solid fa-bars text-xs"></i></div>
                     <select class="bg-transparent text-xs font-medium text-gray-700 py-2.5 pr-2 outline-none cursor-pointer border-r border-gray-200">
                         <option>Products</option>
                         <option>Suppliers</option>
                     </select>
-                    <input type="text" id="searchInput" placeholder="Search for electric cars, bikes, motorcycles, batteries, suppliers..." class="w-full px-4 py-2.5 text-sm outline-none text-gray-700">
+                    <input type="text" placeholder="Search for electric cars, bikes, motorcycles, batteries, suppliers..." class="w-full px-4 py-2.5 text-sm outline-none text-gray-700">
                     <button class="bg-alibaba-orange hover:bg-alibaba-darkOrange text-white px-8 py-2.5 font-medium text-sm transition flex items-center gap-2">
                         <i class="fa-solid fa-magnifying-glass"></i> Search
                     </button>
                 </div>
             </div>
-
-            <!-- User Actions -->
             <div class="flex items-center space-x-6 text-xs text-gray-700">
                 <div class="flex items-center gap-2 cursor-pointer hover:text-alibaba-orange">
                     <div class="relative">
@@ -110,7 +94,7 @@
                     <span class="hidden lg:inline">Cart</span>
                 </div>
                 <div class="flex items-center gap-2 pl-2 border-l border-gray-200 cursor-pointer">
-                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces" alt="User" class="w-8 h-8 rounded-full object-cover border border-gray-300">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces" alt="John Carter" class="w-8 h-8 rounded-full object-cover border border-gray-300">
                     <div class="hidden xl:block text-left">
                         <div class="font-semibold text-gray-900 leading-tight">John Carter</div>
                         <div class="text-[10px] text-gray-500">Buyer Account</div>
@@ -119,8 +103,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Sub Navbar -->
         <div class="border-t border-gray-100 bg-white">
             <div class="max-w-7xl mx-auto px-4 flex items-center space-x-8 text-xs font-semibold py-2.5 overflow-x-auto whitespace-nowrap">
                 <div class="flex items-center gap-2 text-alibaba-orange cursor-pointer">
@@ -141,20 +123,16 @@
 
         <!-- Left Sidebar -->
         <aside class="lg:col-span-3 space-y-4">
-            <!-- Categories -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
                 <div class="text-xs font-bold text-gray-900 uppercase tracking-wider mb-2 px-2 flex items-center gap-2">
                     <i class="fa-solid fa-list text-alibaba-orange"></i> Categories
                 </div>
                 <ul id="sidebarCategories" class="space-y-1 text-xs font-medium text-gray-700">
-                    <!-- Dynamic categories will appear here -->
+                    <!-- filled by JS -->
                 </ul>
-                <div id="sidebarCategoriesEmpty" class="text-center py-4 text-gray-400 text-xs">
-                    <p>No categories yet</p>
-                </div>
+                <div id="sidebarEmpty" class="text-center py-4 text-gray-400 text-xs">No categories yet</div>
             </div>
 
-            <!-- Left Promo Banner -->
             <div class="relative rounded-lg overflow-hidden shadow-sm bg-gradient-to-b from-blue-900 to-blue-950 text-white p-5 flex flex-col justify-between min-h-[340px]">
                 <div class="relative z-10 space-y-2">
                     <h3 class="text-lg font-bold leading-snug">Get the Best Electric Mobility Solutions</h3>
@@ -175,10 +153,9 @@
             </div>
         </aside>
 
-        <!-- Center Content -->
+        <!-- Center -->
         <section class="lg:col-span-6 space-y-5">
-
-            <!-- Hero Banner -->
+            <!-- Hero -->
             <div class="relative rounded-xl overflow-hidden shadow-sm bg-gradient-to-r from-gray-900 via-gray-900 to-blue-950 text-white p-6 md:p-8 flex flex-col justify-between min-h-[300px]">
                 <div class="absolute inset-0 opacity-35 bg-cover bg-center mix-blend-overlay" style="background-image: url('https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=1000&q=80');"></div>
                 <div class="relative z-10 max-w-lg space-y-3">
@@ -207,14 +184,12 @@
                 </div>
             </div>
 
-            <!-- Category Grid Showcase -->
+            <!-- Category Grid -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <div id="categoryGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    <!-- Dynamic category cards -->
-                </div>
+                <div id="categoryGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
                 <div id="categoryEmptyState" class="text-center py-6 text-gray-400 text-xs">
                     <i class="fa-solid fa-folder-open text-2xl mb-1 text-gray-300"></i>
-                    <p>No category shortcuts published yet.</p>
+                    <p>No category shortcuts published yet. Publish items from your backend dashboard.</p>
                 </div>
             </div>
 
@@ -226,15 +201,11 @@
                         View All Products <i class="fa-solid fa-chevron-right text-[10px]"></i>
                     </a>
                 </div>
-
-                <div id="featuredProductsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    <!-- Dynamic products -->
-                </div>
-
+                <div id="featuredProductsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
                 <div id="productsEmptyState" class="text-center py-12 text-gray-400 border border-dashed border-gray-200 rounded-lg">
                     <i class="fa-solid fa-box-archive text-3xl mb-2 text-gray-300"></i>
-                    <p class="text-sm font-medium text-gray-600">No products published yet.</p>
-                    <p class="text-xs text-gray-400 mt-1">Products will appear here instantly after you publish them from the backend.</p>
+                    <p class="text-sm font-medium text-gray-600">No products posted yet.</p>
+                    <p class="text-xs text-gray-400 mt-1">Once you add and publish products from your backend database, they will appear here instantly.</p>
                 </div>
             </div>
 
@@ -246,19 +217,15 @@
                         View All Suppliers <i class="fa-solid fa-chevron-right text-[10px]"></i>
                     </a>
                 </div>
-
-                <div id="verifiedSuppliersGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <!-- Dynamic suppliers -->
-                </div>
-
+                <div id="verifiedSuppliersGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
                 <div id="suppliersEmptyState" class="text-center py-10 text-gray-400 border border-dashed border-gray-200 rounded-lg">
                     <i class="fa-solid fa-store-slash text-3xl mb-2 text-gray-300"></i>
-                    <p class="text-sm font-medium text-gray-600">No verified suppliers yet.</p>
-                    <p class="text-xs text-gray-400 mt-1">Suppliers will appear here once published.</p>
+                    <p class="text-sm font-medium text-gray-600">No verified suppliers listed yet.</p>
+                    <p class="text-xs text-gray-400 mt-1">Suppliers published via your backend will display here.</p>
                 </div>
             </div>
 
-            <!-- Wholesale Deals Strip -->
+            <!-- Wholesale strip -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
                 <div class="flex items-start gap-2.5">
                     <i class="fa-solid fa-tags text-alibaba-orange text-lg mt-0.5"></i>
@@ -293,36 +260,33 @@
 
         <!-- Right Sidebar -->
         <aside class="lg:col-span-3 space-y-4">
-            <!-- Welcome Card -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 space-y-3">
                 <div class="font-bold text-sm text-gray-900">Welcome back, John!</div>
                 <div class="text-[11px] text-gray-500">Here's your trading overview</div>
-                
                 <div class="grid grid-cols-2 gap-2 pt-1">
                     <div class="bg-gray-50 p-2.5 rounded border border-gray-100">
                         <div class="text-[10px] text-gray-500">Active Orders</div>
-                        <div class="text-lg font-bold text-gray-900" id="activeOrdersCount">0</div>
+                        <div class="text-lg font-bold text-gray-900">0</div>
                         <a href="#" class="text-[10px] text-alibaba-orange font-semibold flex items-center gap-1 mt-1">View All <i class="fa-solid fa-arrow-right text-[8px]"></i></a>
                     </div>
                     <div class="bg-gray-50 p-2.5 rounded border border-gray-100">
                         <div class="text-[10px] text-gray-500">Pending Quotations</div>
-                        <div class="text-lg font-bold text-gray-900" id="pendingQuotesCount">0</div>
+                        <div class="text-lg font-bold text-gray-900">0</div>
                         <a href="#" class="text-[10px] text-alibaba-orange font-semibold flex items-center gap-1 mt-1">View All <i class="fa-solid fa-arrow-right text-[8px]"></i></a>
                     </div>
                     <div class="bg-gray-50 p-2.5 rounded border border-gray-100">
                         <div class="text-[10px] text-gray-500">Saved Products</div>
-                        <div class="text-lg font-bold text-gray-900" id="savedProductsCount">0</div>
+                        <div class="text-lg font-bold text-gray-900">0</div>
                         <a href="#" class="text-[10px] text-alibaba-orange font-semibold flex items-center gap-1 mt-1">View All <i class="fa-solid fa-arrow-right text-[8px]"></i></a>
                     </div>
                     <div class="bg-gray-50 p-2.5 rounded border border-gray-100">
                         <div class="text-[10px] text-gray-500">Favorite Suppliers</div>
-                        <div class="text-lg font-bold text-gray-900" id="favoriteSuppliersCount">0</div>
+                        <div class="text-lg font-bold text-gray-900">0</div>
                         <a href="#" class="text-[10px] text-alibaba-orange font-semibold flex items-center gap-1 mt-1">View All <i class="fa-solid fa-arrow-right text-[8px]"></i></a>
                     </div>
                 </div>
             </div>
 
-            <!-- Quick Access -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
                 <div class="text-xs font-bold text-gray-900 mb-2 px-2">Quick Access</div>
                 <ul class="space-y-1 text-xs font-medium text-gray-700">
@@ -345,11 +309,9 @@
                 </ul>
             </div>
 
-            <!-- Popular Searches -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 space-y-2">
                 <div class="text-xs font-bold text-gray-900">Popular Searches</div>
-                <div id="popularSearches" class="flex flex-wrap gap-1.5 text-[11px]">
-                    <!-- Will be filled dynamically later -->
+                <div class="flex flex-wrap gap-1.5 text-[11px]">
                     <span class="bg-gray-100 hover:bg-orange-50 hover:text-alibaba-orange px-2.5 py-1 rounded-full cursor-pointer transition text-gray-600">electric car</span>
                     <span class="bg-gray-100 hover:bg-orange-50 hover:text-alibaba-orange px-2.5 py-1 rounded-full cursor-pointer transition text-gray-600">electric bike</span>
                     <span class="bg-gray-100 hover:bg-orange-50 hover:text-alibaba-orange px-2.5 py-1 rounded-full cursor-pointer transition text-gray-600">lithium battery</span>
@@ -358,7 +320,6 @@
                 </div>
             </div>
 
-            <!-- Right Promo -->
             <div class="rounded-lg overflow-hidden shadow-sm bg-gradient-to-br from-gray-900 to-blue-950 text-white p-4 space-y-3">
                 <div class="text-xs font-bold text-orange-400 uppercase tracking-wider">Sustainable Mobility</div>
                 <div class="text-sm font-bold leading-snug">Quality electric vehicles and components from trusted suppliers worldwide.</div>
@@ -369,19 +330,15 @@
         </aside>
     </main>
 
-    <!-- Footer -->
     <footer class="bg-white border-t border-gray-200 mt-10 py-6 text-center text-xs text-gray-500">
         <p>&copy; 2026 Alibaba.com. All rights reserved. Global B2B Sourcing Platform.</p>
     </footer>
 
-    <!-- ==================== SUPABASE + REALTIME SCRIPT ==================== -->
     <script>
-        // ====================== YOUR SUPABASE CREDENTIALS ======================
+        // ====================== YOUR SUPABASE ======================
         const SUPABASE_URL = 'https://zgbdhpebmjokbaeflqhj.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_m5osddO3GFnJlQYIvSHS3Q_WqF72WwV';
-
-        // Initialize Supabase client
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const SUPABASE_KEY = 'sb_publishable_m5osddO3GFnJlQYIvSHS3Q_WqF72WwV';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // ====================== STATE ======================
         let products = [];
@@ -395,26 +352,18 @@
             return 'Price on request';
         }
 
-        function getBadge(product) {
-            if (product.is_top_seller) return { text: 'Top Seller', color: 'bg-orange-500' };
-            if (product.is_hot) return { text: 'Hot', color: 'bg-red-500' };
-            if (product.is_best_price) return { text: 'Best Price', color: 'bg-green-500' };
-            if (product.is_featured) return { text: 'Featured', color: 'bg-blue-500' };
+        function getBadge(p) {
+            if (p.is_top_seller) return { text: 'Top Seller', color: 'bg-orange-500' };
+            if (p.is_hot) return { text: 'Hot', color: 'bg-red-500' };
+            if (p.is_best_price) return { text: 'Best Price', color: 'bg-green-500' };
+            if (p.is_featured) return { text: 'Featured', color: 'bg-blue-500' };
             return { text: 'New', color: 'bg-gray-500' };
         }
 
-        function getCountryFlag(country) {
-            const map = {
-                'China': 'cn', 'Germany': 'de', 'USA': 'us', 'Japan': 'jp',
-                'South Korea': 'kr', 'India': 'in', 'Vietnam': 'vn'
-            };
-            return map[country] || 'cn';
-        }
-
-        // ====================== RENDER FUNCTIONS ======================
+        // ====================== RENDER ======================
         function renderCategories() {
             const sidebar = document.getElementById('sidebarCategories');
-            const sidebarEmpty = document.getElementById('sidebarCategoriesEmpty');
+            const sidebarEmpty = document.getElementById('sidebarEmpty');
             const grid = document.getElementById('categoryGrid');
             const empty = document.getElementById('categoryEmptyState');
 
@@ -429,7 +378,6 @@
             sidebarEmpty.style.display = 'none';
             empty.style.display = 'none';
 
-            // Sidebar list
             const iconMap = {
                 'Electric Bikes': 'fa-bicycle',
                 'Electric Motorcycles': 'fa-motorcycle',
@@ -453,11 +401,10 @@
                 </li>
             `).join('');
 
-            // Category cards (top 6)
             grid.innerHTML = categories.slice(0, 6).map(cat => `
-                <div class="bg-gray-50 border border-gray-100 rounded-lg p-2.5 text-center hover:shadow-md transition cursor-pointer group">
-                    <div class="w-full h-20 bg-white rounded flex items-center justify-center mb-2 overflow-hidden">
-                        <i class="fa-solid ${iconMap[cat.name] || 'fa-box'} text-3xl text-gray-300 group-hover:text-alibaba-orange transition"></i>
+                <div class="bg-gray-50 border border-gray-100 rounded-lg p-2.5 text-center hover:shadow-md transition cursor-pointer">
+                    <div class="w-full h-20 bg-white rounded flex items-center justify-center mb-2">
+                        <i class="fa-solid ${iconMap[cat.name] || 'fa-box'} text-3xl text-gray-300"></i>
                     </div>
                     <div class="text-xs font-bold text-gray-800">${cat.name}</div>
                     <div class="text-[10px] text-alibaba-orange font-semibold mt-0.5">Shop now →</div>
@@ -479,37 +426,26 @@
 
             grid.innerHTML = products.map(p => {
                 const badge = getBadge(p);
-                const flag = getCountryFlag(p.country);
-                const specs = p.specs ? Object.values(p.specs).slice(0, 2).join(' | ') : '';
-
                 return `
-                    <div class="bg-white border border-gray-200 rounded-lg p-3 flex flex-col justify-between hover:shadow-md transition group">
+                    <div class="bg-white border border-gray-200 rounded-lg p-3 flex flex-col justify-between hover:shadow-md transition">
                         <div>
                             <div class="relative mb-2">
-                                <span class="absolute top-1 left-1 ${badge.color} text-white text-[9px] font-bold px-1.5 py-0.5 rounded z-10">
-                                    ${badge.text}
-                                </span>
+                                <span class="absolute top-1 left-1 ${badge.color} text-white text-[9px] font-bold px-1.5 py-0.5 rounded z-10">${badge.text}</span>
                                 <img src="${p.main_image_url || 'https://via.placeholder.com/300x200?text=No+Image'}" 
                                      alt="${p.title}" 
-                                     class="w-full h-36 object-contain rounded bg-gray-50 group-hover:scale-105 transition duration-300">
+                                     class="w-full h-36 object-contain rounded bg-gray-50">
                             </div>
                             <h3 class="text-xs font-bold text-gray-800 line-clamp-2 mb-1">${p.title}</h3>
-                            <div class="text-[10px] text-gray-500 mb-2 line-clamp-1">${specs}</div>
                             <div class="text-sm font-black text-gray-900">${formatPrice(p.price_min, p.price_max)}</div>
                             <div class="text-[10px] text-gray-500">MOQ: ${p.moq || 1} units</div>
                         </div>
                         <div class="mt-3 pt-2 border-t border-gray-100 flex items-center justify-between gap-2">
                             <span class="text-[10px] text-gray-600 flex items-center gap-1">
-                                <img src="https://flagcdn.com/w20/${flag}.png" class="w-3.5"> 
-                                ${p.country || 'China'}
+                                <img src="https://flagcdn.com/w20/cn.png" class="w-3.5"> ${p.country || 'China'}
                             </span>
                             <div class="flex gap-1">
-                                <button class="bg-orange-50 text-alibaba-orange hover:bg-alibaba-orange hover:text-white px-2 py-1 rounded text-[10px] font-semibold transition">
-                                    Contact
-                                </button>
-                                <button class="bg-gray-100 text-gray-700 hover:bg-gray-200 px-2 py-1 rounded text-[10px] font-semibold transition">
-                                    Quote
-                                </button>
+                                <button class="bg-orange-50 text-alibaba-orange hover:bg-alibaba-orange hover:text-white px-2 py-1 rounded text-[10px] font-semibold transition">Contact</button>
+                                <button class="bg-gray-100 text-gray-700 hover:bg-gray-200 px-2 py-1 rounded text-[10px] font-semibold transition">Quote</button>
                             </div>
                         </div>
                     </div>
@@ -530,7 +466,7 @@
             empty.style.display = 'none';
 
             grid.innerHTML = suppliers.map(s => `
-                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 flex flex-col justify-between hover:shadow-md transition">
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between mb-2">
                             <span class="font-bold text-xs text-gray-900 truncate">${s.company_name}</span>
@@ -546,13 +482,13 @@
                     </div>
                     <div class="mt-3 pt-2 border-t border-gray-200 flex justify-between">
                         <button class="text-[10px] font-semibold text-alibaba-orange hover:underline">View Supplier</button>
-                        <button class="text-[10px] font-semibold bg-alibaba-orange text-white px-3 py-1 rounded hover:bg-alibaba-darkOrange transition">Contact</button>
+                        <button class="text-[10px] font-semibold bg-alibaba-orange text-white px-3 py-1 rounded">Contact</button>
                     </div>
                 </div>
             `).join('');
         }
 
-        // ====================== DATA FETCHING ======================
+        // ====================== FETCH ======================
         async function loadCategories() {
             const { data, error } = await supabase
                 .from('categories')
@@ -560,10 +496,7 @@
                 .eq('is_active', true)
                 .order('sort_order', { ascending: true });
 
-            if (error) {
-                console.error('Categories error:', error);
-                return;
-            }
+            if (error) console.error(error);
             categories = data || [];
             renderCategories();
         }
@@ -571,26 +504,13 @@
         async function loadProducts() {
             const { data, error } = await supabase
                 .from('products')
-                .select(`
-                    *,
-                    suppliers (
-                        company_name,
-                        country,
-                        years_in_business,
-                        is_verified,
-                        is_gold,
-                        badge
-                    )
-                `)
+                .select('*')
                 .eq('status', 'published')
                 .order('is_featured', { ascending: false })
                 .order('published_at', { ascending: false })
                 .limit(12);
 
-            if (error) {
-                console.error('Products error:', error);
-                return;
-            }
+            if (error) console.error(error);
             products = data || [];
             renderProducts();
         }
@@ -604,57 +524,30 @@
                 .order('is_gold', { ascending: false })
                 .limit(8);
 
-            if (error) {
-                console.error('Suppliers error:', error);
-                return;
-            }
+            if (error) console.error(error);
             suppliers = data || [];
             renderSuppliers();
         }
 
         // ====================== REALTIME ======================
         function setupRealtime() {
-            // Products realtime
-            supabase
-                .channel('public:products')
-                .on('postgres_changes', 
-                    { event: '*', schema: 'public', table: 'products' }, 
-                    (payload) => {
-                        console.log('Product change:', payload);
-                        loadProducts(); // re-fetch on any change
-                    }
-                )
+            supabase.channel('public:products')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => loadProducts())
                 .subscribe();
 
-            // Categories realtime
-            supabase
-                .channel('public:categories')
-                .on('postgres_changes', 
-                    { event: '*', schema: 'public', table: 'categories' }, 
-                    () => loadCategories()
-                )
+            supabase.channel('public:categories')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'categories' }, () => loadCategories())
                 .subscribe();
 
-            // Suppliers realtime
-            supabase
-                .channel('public:suppliers')
-                .on('postgres_changes', 
-                    { event: '*', schema: 'public', table: 'suppliers' }, 
-                    () => loadSuppliers()
-                )
+            supabase.channel('public:suppliers')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'suppliers' }, () => loadSuppliers())
                 .subscribe();
         }
 
         // ====================== INIT ======================
         async function init() {
-            console.log('Connecting to Supabase...');
-            await Promise.all([
-                loadCategories(),
-                loadProducts(),
-                loadSuppliers()
-            ]);
+            await Promise.all([loadCategories(), loadProducts(), loadSuppliers()]);
             setupRealtime();
-            console.log('Marketplace ready + Realtime active');
         }
 
         document.addEventListener('DOMContentLoaded', init);
