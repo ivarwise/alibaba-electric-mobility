@@ -1,415 +1,441 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Admin Dashboard</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-  .preview-img { width: 80px; height: 80px; object-fit: cover; border-radius: 10px; }
-  body { -webkit-tap-highlight-color: transparent; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .preview-img { width: 85px; height: 85px; object-fit: cover; border-radius: 10px; }
+    body { -webkit-tap-highlight-color: transparent; }
+  </style>
 </head>
 <body class="bg-gray-100">
 
-<header class="bg-white border-b sticky top-0 z-50">
-  <div class="max-w-lg mx-auto px-4 py-3 flex justify-between items-center">
-    <div class="font-bold text-orange-600 text-lg">Admin Dashboard</div>
-    <a href="index.html" class="text-sm text-orange-600 font-medium">Public Site →</a>
-  </div>
-</header>
-
-<main class="max-w-lg mx-auto px-4 py-5 space-y-5">
-
-  <div class="bg-white rounded-2xl shadow-sm border p-5">
-    <h2 id="formTitle" class="text-lg font-bold mb-4">Add New Product</h2>
-
-    <form id="productForm" class="space-y-4">
-
-      <div>
-        <label class="block text-xs font-semibold text-gray-600 mb-1">Product Name *</label>
-        <input type="text" id="title" required placeholder="e.g. Electric Mountain Bike 750W"
-               class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
-      </div>
-
-      <div class="grid grid-cols-2 gap-3">
-        <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">Min Price ($)</label>
-          <input type="number" id="priceMin" step="0.01" placeholder="350"
-                 class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">Max Price ($)</label>
-          <input type="number" id="priceMax" step="0.01" placeholder="650"
-                 class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
-        </div>
-      </div>
-
-      <div class="grid grid-cols-2 gap-3">
-        <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">MOQ</label>
-          <input type="number" id="moq" value="1" min="1"
-                 class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">Country</label>
-          <input type="text" id="country" value="China"
-                 class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
-        </div>
-      </div>
-
-      <div>
-        <label class="block text-xs font-semibold text-gray-600 mb-1">Category (type freely)</label>
-        <input type="text" id="categoryName" placeholder="Electric Bikes, Batteries, Scooters..."
-               class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
-      </div>
-
-      <div>
-        <label class="block text-xs font-semibold text-gray-600 mb-1">Status</label>
-        <select id="status" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
-          <option value="published">Published (show on public site)</option>
-          <option value="draft">Draft (hidden)</option>
-        </select>
-      </div>
-
-      <div class="flex flex-wrap gap-4 text-sm pt-1">
-        <label class="flex items-center gap-2"><input type="checkbox" id="isFeatured" class="rounded"> Featured</label>
-        <label class="flex items-center gap-2"><input type="checkbox" id="isHot" class="rounded"> Hot</label>
-        <label class="flex items-center gap-2"><input type="checkbox" id="isBestPrice" class="rounded"> Best Price</label>
-        <label class="flex items-center gap-2"><input type="checkbox" id="isTopSeller" class="rounded"> Top Seller</label>
-      </div>
-
-      <div>
-        <label class="block text-xs font-semibold text-gray-600 mb-1">Long Description</label>
-        <textarea id="description" rows="4" placeholder="Write full product details here..."
-                  class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500"></textarea>
-      </div>
-
-      <!-- ===================== PHOTO SELECTOR - iOS FIXED ===================== -->
-      <div>
-        <label class="block text-xs font-semibold text-gray-600 mb-1">Photos (max 10)</label>
-
-        <!-- THIS is the only reliable way on iOS -->
-        <label for="imageInput"
-               class="w-full border-2 border-dashed border-gray-300 rounded-2xl py-8 text-center bg-gray-50 block cursor-pointer active:bg-orange-50">
-          <i class="fa-solid fa-camera text-3xl text-gray-400 mb-2"></i>
-          <div class="text-sm font-medium text-gray-700">Tap to select photos from gallery</div>
-          <div class="text-xs text-gray-400 mt-1">You can select multiple photos</div>
-        </label>
-
-        <input type="file" id="imageInput" accept="image/*" multiple class="hidden">
-
-        <div id="imagePreview" class="flex flex-wrap gap-2 mt-3"></div>
-      </div>
-
-      <button type="submit" id="submitBtn"
-              class="w-full bg-orange-500 active:bg-orange-600 text-white font-bold py-3.5 rounded-xl text-sm">
-        Publish Product
-      </button>
-
-      <button type="button" id="cancelEdit" class="hidden w-full border border-gray-300 py-3 rounded-xl text-sm mt-2">
-        Cancel Edit
-      </button>
-    </form>
-  </div>
-
-  <!-- PRODUCTS LIST -->
-  <div class="bg-white rounded-2xl shadow-sm border p-5">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="font-bold">Your Products</h2>
-      <span id="productCount" class="text-xs text-gray-500">0</span>
+  <!-- Header -->
+  <header class="bg-white border-b sticky top-0 z-50">
+    <div class="max-w-lg mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="font-bold text-orange-600 text-lg">Admin Dashboard</div>
+      <a href="index.html" class="text-sm text-orange-600 font-medium">Public Site →</a>
     </div>
-    <div id="productsList" class="space-y-3"></div>
-    <div id="emptyList" class="text-center py-10 text-gray-400 text-sm">No products yet</div>
-  </div>
+  </header>
 
-</main>
+  <main class="max-w-lg mx-auto px-4 py-5 space-y-5">
 
-<script>
-  const SUPABASE_URL = 'https://zgbdhpebmjokbaeflqhj.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_m5osddO3GFnJlQYIvSHS3Q_WqF72WwV';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    <!-- FORM -->
+    <div class="bg-white rounded-2xl shadow-sm border p-5">
+      <h2 id="formTitle" class="text-lg font-bold mb-4">Add New Product</h2>
 
-  let selectedFiles = [];
-  let existingImages = [];
-  let editingId = null;
+      <form id="productForm" class="space-y-4">
 
-  const imageInput = document.getElementById('imageInput');
-  const imagePreview = document.getElementById('imagePreview');
-  const form = document.getElementById('productForm');
-  const submitBtn = document.getElementById('submitBtn');
-  const cancelEdit = document.getElementById('cancelEdit');
+        <!-- Product Name -->
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Product Name *</label>
+          <input type="text" id="title" required placeholder="e.g. Electric Mountain Bike 750W"
+                 class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
+        </div>
 
-  // ====================== PHOTO HANDLING ======================
-  imageInput.addEventListener('change', function(e) {
-    const files = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
+        <!-- Prices -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Min Price ($)</label>
+            <input type="number" id="priceMin" step="0.01" placeholder="350"
+                   class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Max Price ($)</label>
+            <input type="number" id="priceMax" step="0.01" placeholder="650"
+                   class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
+          </div>
+        </div>
 
-    if (selectedFiles.length + existingImages.length + files.length > 10) {
-      alert('Maximum 10 photos allowed');
-      return;
-    }
+        <!-- MOQ + Country -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">MOQ</label>
+            <input type="number" id="moq" value="1" min="1"
+                   class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Country</label>
+            <input type="text" id="country" value="China"
+                   class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
+          </div>
+        </div>
 
-    selectedFiles = selectedFiles.concat(files);
-    renderPreviews();
-    // Do NOT clear the input value on iOS - it can break subsequent selections
-  });
+        <!-- Category - Free text -->
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Category (type freely)</label>
+          <input type="text" id="categoryName" placeholder="Electric Bikes, Batteries, Scooters..."
+                 class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
+        </div>
 
-  function renderPreviews() {
-    imagePreview.innerHTML = '';
+        <!-- Status -->
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Status</label>
+          <select id="status" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
+            <option value="published">Published (show on public site)</option>
+            <option value="draft">Draft (hidden)</option>
+          </select>
+        </div>
 
-    existingImages.forEach((url, i) => {
-      const div = document.createElement('div');
-      div.className = 'relative';
-      div.innerHTML = `
-        <img src="${url}" class="preview-img border">
-        <button type="button" onclick="removeExisting(${i})"
-                class="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full text-xs flex items-center justify-center">×</button>
-      `;
-      imagePreview.appendChild(div);
-    });
+        <!-- Flags -->
+        <div class="flex flex-wrap gap-4 text-sm">
+          <label class="flex items-center gap-2"><input type="checkbox" id="isFeatured" class="rounded"> Featured</label>
+          <label class="flex items-center gap-2"><input type="checkbox" id="isHot" class="rounded"> Hot</label>
+          <label class="flex items-center gap-2"><input type="checkbox" id="isBestPrice" class="rounded"> Best Price</label>
+          <label class="flex items-center gap-2"><input type="checkbox" id="isTopSeller" class="rounded"> Top Seller</label>
+        </div>
 
-    selectedFiles.forEach((file, i) => {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const div = document.createElement('div');
-        div.className = 'relative';
-        div.innerHTML = `
-          <img src="${e.target.result}" class="preview-img border">
-          <button type="button" onclick="removeNew(${i})"
-                  class="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full text-xs flex items-center justify-center">×</button>
-        `;
-        imagePreview.appendChild(div);
-      };
-      reader.readAsDataURL(file);
-    });
-  }
+        <!-- Description -->
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Long Description</label>
+          <textarea id="description" rows="4" placeholder="Write full product details..."
+                    class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500"></textarea>
+        </div>
 
-  window.removeExisting = function(i) {
-    existingImages.splice(i, 1);
-    renderPreviews();
-  };
+        <!-- ================= PHOTO SELECTOR (working method) ================= -->
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Photos (max 10)</label>
 
-  window.removeNew = function(i) {
-    selectedFiles.splice(i, 1);
-    renderPreviews();
-  };
+          <label for="imageInput"
+                 class="block w-full border-2 border-dashed border-orange-400 rounded-2xl py-8 text-center bg-gray-50 cursor-pointer active:bg-orange-50">
+            <div class="text-3xl mb-2">📷</div>
+            <div class="font-semibold text-gray-800">Tap to select photos</div>
+            <div class="text-xs text-gray-500 mt-1">You can select multiple</div>
+          </label>
 
-  // ====================== UPLOAD ======================
-  async function uploadImages() {
-    const urls = [...existingImages];
+          <input type="file" id="imageInput" accept="image/*" multiple class="hidden">
 
-    for (const file of selectedFiles) {
-      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
-      const fileName = Date.now() + '-' + Math.random().toString(36).substring(2, 9) + '.' + ext;
-      const path = 'products/' + fileName;
+          <div id="imagePreview" class="flex flex-wrap gap-2 mt-3"></div>
+          <p id="photoStatus" class="text-xs text-gray-500 mt-1"></p>
+        </div>
 
-      const { error } = await supabase.storage
-        .from('product-images')
-        .upload(path, file, { contentType: file.type });
+        <!-- Submit -->
+        <button type="submit" id="submitBtn"
+                class="w-full bg-orange-500 active:bg-orange-600 text-white font-bold py-3.5 rounded-xl text-sm">
+          Publish Product
+        </button>
 
-      if (error) {
-        console.error(error);
-        throw new Error('Image upload failed: ' + error.message);
-      }
+        <button type="button" id="cancelEdit"
+                class="hidden w-full border border-gray-300 py-3 rounded-xl text-sm mt-2">
+          Cancel Edit
+        </button>
+      </form>
+    </div>
 
-      const { data } = supabase.storage.from('product-images').getPublicUrl(path);
-      urls.push(data.publicUrl);
-    }
-    return urls;
-  }
+    <!-- PRODUCTS LIST -->
+    <div class="bg-white rounded-2xl shadow-sm border p-5">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="font-bold">Your Products</h2>
+        <span id="productCount" class="text-xs text-gray-500">0</span>
+      </div>
+      <div id="productsList" class="space-y-3"></div>
+      <div id="emptyList" class="text-center py-10 text-gray-400 text-sm">No products yet</div>
+    </div>
 
-  async function getSupplierId() {
-    const { data } = await supabase.from('suppliers').select('id').limit(1).maybeSingle();
-    if (data) return data.id;
+  </main>
 
-    const { data: newSup, error } = await supabase.from('suppliers').insert([{
-      company_name: 'Main Supplier',
-      country: 'China',
-      is_verified: true,
-      is_active: true
-    }]).select().single();
+  <script>
+    // ====================== SUPABASE ======================
+    const SUPABASE_URL = 'https://zgbdhpebmjokbaeflqhj.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_m5osddO3GFnJlQYIvSHS3Q_WqF72WwV';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    if (error) throw error;
-    return newSup.id;
-  }
+    // ====================== STATE ======================
+    let selectedFiles = [];
+    let existingImages = [];
+    let editingId = null;
 
-  async function getCategoryId(name) {
-    if (!name || !name.trim()) return null;
-    const clean = name.trim();
+    // ====================== DOM ======================
+    const imageInput = document.getElementById('imageInput');
+    const imagePreview = document.getElementById('imagePreview');
+    const photoStatus = document.getElementById('photoStatus');
+    const form = document.getElementById('productForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const cancelEdit = document.getElementById('cancelEdit');
 
-    const { data } = await supabase
-      .from('categories')
-      .select('id')
-      .ilike('name', clean)
-      .maybeSingle();
+    // ====================== PHOTO PREVIEW (same working method) ======================
+    imageInput.addEventListener('change', function () {
+      const files = Array.from(imageInput.files).filter(f => f.type.startsWith('image/'));
 
-    if (data) return data.id;
-
-    const slug = clean.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    const { data: newCat, error } = await supabase.from('categories').insert([{
-      name: clean,
-      slug: slug,
-      is_active: true
-    }]).select().single();
-
-    if (error) return null;
-    return newCat.id;
-  }
-
-  // ====================== SUBMIT ======================
-  form.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Saving...';
-
-    try {
-      if (selectedFiles.length + existingImages.length === 0) {
-        alert('Please select at least 1 photo');
+      if (selectedFiles.length + existingImages.length + files.length > 10) {
+        alert('Maximum 10 photos allowed');
         return;
       }
 
-      const imageUrls = await uploadImages();
-      const supplierId = await getSupplierId();
-      const categoryId = await getCategoryId(document.getElementById('categoryName').value);
+      selectedFiles = selectedFiles.concat(files);
+      renderPreviews();
+    });
 
-      const payload = {
-        title: document.getElementById('title').value.trim(),
-        price_min: parseFloat(document.getElementById('priceMin').value) || null,
-        price_max: parseFloat(document.getElementById('priceMax').value) || null,
-        moq: parseInt(document.getElementById('moq').value) || 1,
-        category_id: categoryId,
-        country: document.getElementById('country').value.trim() || 'China',
-        status: document.getElementById('status').value,
-        is_featured: document.getElementById('isFeatured').checked,
-        is_hot: document.getElementById('isHot').checked,
-        is_best_price: document.getElementById('isBestPrice').checked,
-        is_top_seller: document.getElementById('isTopSeller').checked,
-        description: document.getElementById('description').value.trim(),
-        main_image_url: imageUrls[0],
-        images: imageUrls,
-        supplier_id: supplierId
-      };
+    function renderPreviews() {
+      imagePreview.innerHTML = '';
+      const total = existingImages.length + selectedFiles.length;
+      photoStatus.textContent = total > 0 ? total + ' photo(s) selected' : '';
 
-      let result;
-      if (editingId) {
-        result = await supabase.from('products').update(payload).eq('id', editingId).select();
-      } else {
-        result = await supabase.from('products').insert([payload]).select();
+      // Existing images (when editing)
+      existingImages.forEach((url, i) => {
+        const div = document.createElement('div');
+        div.className = 'relative';
+        div.innerHTML = `
+          <img src="${url}" class="preview-img border">
+          <button type="button" onclick="removeExisting(${i})"
+                  class="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full text-xs flex items-center justify-center">×</button>
+        `;
+        imagePreview.appendChild(div);
+      });
+
+      // New selected files
+      selectedFiles.forEach((file, i) => {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const div = document.createElement('div');
+          div.className = 'relative';
+          div.innerHTML = `
+            <img src="${e.target.result}" class="preview-img border">
+            <button type="button" onclick="removeNew(${i})"
+                    class="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full text-xs flex items-center justify-center">×</button>
+          `;
+          imagePreview.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    window.removeExisting = function (i) {
+      existingImages.splice(i, 1);
+      renderPreviews();
+    };
+
+    window.removeNew = function (i) {
+      selectedFiles.splice(i, 1);
+      renderPreviews();
+    };
+
+    // ====================== UPLOAD IMAGES ======================
+    async function uploadImages() {
+      const urls = [...existingImages];
+
+      for (const file of selectedFiles) {
+        const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+        const fileName = Date.now() + '-' + Math.random().toString(36).substring(2, 9) + '.' + ext;
+        const path = 'products/' + fileName;
+
+        const { error } = await supabase.storage
+          .from('product-images')
+          .upload(path, file, { contentType: file.type });
+
+        if (error) {
+          console.error(error);
+          throw new Error('Image upload failed: ' + error.message);
+        }
+
+        const { data } = supabase.storage.from('product-images').getPublicUrl(path);
+        urls.push(data.publicUrl);
+      }
+      return urls;
+    }
+
+    // ====================== HELPERS ======================
+    async function getSupplierId() {
+      const { data } = await supabase.from('suppliers').select('id').limit(1).maybeSingle();
+      if (data) return data.id;
+
+      const { data: newSup, error } = await supabase.from('suppliers').insert([{
+        company_name: 'Main Supplier',
+        country: 'China',
+        is_verified: true,
+        is_active: true
+      }]).select().single();
+
+      if (error) throw error;
+      return newSup.id;
+    }
+
+    async function getCategoryId(name) {
+      if (!name || !name.trim()) return null;
+      const clean = name.trim();
+
+      const { data } = await supabase
+        .from('categories')
+        .select('id')
+        .ilike('name', clean)
+        .maybeSingle();
+
+      if (data) return data.id;
+
+      const slug = clean.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const { data: newCat, error } = await supabase.from('categories').insert([{
+        name: clean,
+        slug: slug,
+        is_active: true
+      }]).select().single();
+
+      if (error) return null;
+      return newCat.id;
+    }
+
+    // ====================== SUBMIT ======================
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Saving...';
+
+      try {
+        if (selectedFiles.length + existingImages.length === 0) {
+          alert('Please select at least 1 photo');
+          return;
+        }
+
+        const imageUrls = await uploadImages();
+        const supplierId = await getSupplierId();
+        const categoryId = await getCategoryId(document.getElementById('categoryName').value);
+
+        const payload = {
+          title: document.getElementById('title').value.trim(),
+          price_min: parseFloat(document.getElementById('priceMin').value) || null,
+          price_max: parseFloat(document.getElementById('priceMax').value) || null,
+          moq: parseInt(document.getElementById('moq').value) || 1,
+          category_id: categoryId,
+          country: document.getElementById('country').value.trim() || 'China',
+          status: document.getElementById('status').value,
+          is_featured: document.getElementById('isFeatured').checked,
+          is_hot: document.getElementById('isHot').checked,
+          is_best_price: document.getElementById('isBestPrice').checked,
+          is_top_seller: document.getElementById('isTopSeller').checked,
+          description: document.getElementById('description').value.trim(),
+          main_image_url: imageUrls[0],
+          images: imageUrls,
+          supplier_id: supplierId
+        };
+
+        let result;
+        if (editingId) {
+          result = await supabase.from('products').update(payload).eq('id', editingId).select();
+        } else {
+          result = await supabase.from('products').insert([payload]).select();
+        }
+
+        if (result.error) throw result.error;
+
+        alert(editingId ? 'Product updated successfully!' : 'Product published successfully!');
+        resetForm();
+        loadProducts();
+
+      } catch (err) {
+        console.error(err);
+        alert('Error: ' + (err.message || 'Something went wrong'));
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = editingId ? 'Update Product' : 'Publish Product';
+      }
+    });
+
+    // ====================== LOAD PRODUCTS ======================
+    async function loadProducts() {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error(error);
+        return;
       }
 
-      if (result.error) throw result.error;
+      const list = data || [];
+      document.getElementById('productCount').textContent = list.length + ' products';
 
-      alert(editingId ? 'Product updated!' : 'Product published!');
-      resetForm();
-      loadProducts();
+      const container = document.getElementById('productsList');
+      const empty = document.getElementById('emptyList');
 
-    } catch (err) {
-      console.error(err);
-      alert('Error: ' + (err.message || 'Something went wrong'));
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = editingId ? 'Update Product' : 'Publish Product';
-    }
-  });
+      if (list.length === 0) {
+        container.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
 
-  // ====================== LOAD / EDIT / DELETE ======================
-  async function loadProducts() {
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) return console.error(error);
-
-    const list = data || [];
-    document.getElementById('productCount').textContent = list.length + ' products';
-
-    const container = document.getElementById('productsList');
-    const empty = document.getElementById('emptyList');
-
-    if (list.length === 0) {
-      container.innerHTML = '';
-      empty.style.display = 'block';
-      return;
-    }
-
-    empty.style.display = 'none';
-    container.innerHTML = list.map(p => `
-      <div class="flex gap-3 p-3 border rounded-xl">
-        <img src="${p.main_image_url || 'https://via.placeholder.com/80'}" class="w-16 h-16 object-cover rounded-xl">
-        <div class="flex-1 min-w-0">
-          <div class="font-semibold text-sm truncate">${p.title}</div>
-          <div class="text-xs text-gray-500 mt-0.5">$${p.price_min || 0} - $${p.price_max || 0}</div>
-          <div class="text-xs mt-1 ${p.status === 'published' ? 'text-green-600' : 'text-gray-500'}">${p.status}</div>
-          <div class="flex gap-4 mt-1.5">
-            <button onclick="editProduct('${p.id}')" class="text-xs text-blue-600 font-medium">Edit</button>
-            <button onclick="deleteProduct('${p.id}')" class="text-xs text-red-600 font-medium">Delete</button>
+      empty.style.display = 'none';
+      container.innerHTML = list.map(p => `
+        <div class="flex gap-3 p-3 border rounded-xl">
+          <img src="${p.main_image_url || 'https://via.placeholder.com/80'}" class="w-16 h-16 object-cover rounded-xl">
+          <div class="flex-1 min-w-0">
+            <div class="font-semibold text-sm truncate">${p.title}</div>
+            <div class="text-xs text-gray-500 mt-0.5">$${p.price_min || 0} - $${p.price_max || 0}</div>
+            <div class="text-xs mt-1 ${p.status === 'published' ? 'text-green-600' : 'text-gray-500'}">${p.status}</div>
+            <div class="flex gap-4 mt-1.5">
+              <button onclick="editProduct('${p.id}')" class="text-xs text-blue-600 font-medium">Edit</button>
+              <button onclick="deleteProduct('${p.id}')" class="text-xs text-red-600 font-medium">Delete</button>
+            </div>
           </div>
         </div>
-      </div>
-    `).join('');
-  }
-
-  window.editProduct = async function(id) {
-    const { data, error } = await supabase.from('products').select('*').eq('id', id).single();
-    if (error || !data) return alert('Product not found');
-
-    editingId = id;
-    document.getElementById('formTitle').textContent = 'Edit Product';
-    submitBtn.textContent = 'Update Product';
-    cancelEdit.classList.remove('hidden');
-
-    document.getElementById('title').value = data.title || '';
-    document.getElementById('priceMin').value = data.price_min || '';
-    document.getElementById('priceMax').value = data.price_max || '';
-    document.getElementById('moq').value = data.moq || 1;
-    document.getElementById('country').value = data.country || 'China';
-    document.getElementById('status').value = data.status || 'published';
-    document.getElementById('description').value = data.description || '';
-    document.getElementById('isFeatured').checked = !!data.is_featured;
-    document.getElementById('isHot').checked = !!data.is_hot;
-    document.getElementById('isBestPrice').checked = !!data.is_best_price;
-    document.getElementById('isTopSeller').checked = !!data.is_top_seller;
-
-    if (data.category_id) {
-      const { data: cat } = await supabase.from('categories').select('name').eq('id', data.category_id).single();
-      document.getElementById('categoryName').value = cat ? cat.name : '';
-    } else {
-      document.getElementById('categoryName').value = '';
+      `).join('');
     }
 
-    existingImages = data.images || (data.main_image_url ? [data.main_image_url] : []);
-    selectedFiles = [];
-    renderPreviews();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+    // ====================== EDIT ======================
+    window.editProduct = async function (id) {
+      const { data, error } = await supabase.from('products').select('*').eq('id', id).single();
+      if (error || !data) return alert('Product not found');
 
-  cancelEdit.addEventListener('click', resetForm);
+      editingId = id;
+      document.getElementById('formTitle').textContent = 'Edit Product';
+      submitBtn.textContent = 'Update Product';
+      cancelEdit.classList.remove('hidden');
 
-  function resetForm() {
-    editingId = null;
-    form.reset();
-    selectedFiles = [];
-    existingImages = [];
-    imagePreview.innerHTML = '';
-    document.getElementById('formTitle').textContent = 'Add New Product';
-    submitBtn.textContent = 'Publish Product';
-    cancelEdit.classList.add('hidden');
-    document.getElementById('status').value = 'published';
-    document.getElementById('country').value = 'China';
-    document.getElementById('moq').value = 1;
-  }
+      document.getElementById('title').value = data.title || '';
+      document.getElementById('priceMin').value = data.price_min || '';
+      document.getElementById('priceMax').value = data.price_max || '';
+      document.getElementById('moq').value = data.moq || 1;
+      document.getElementById('country').value = data.country || 'China';
+      document.getElementById('status').value = data.status || 'published';
+      document.getElementById('description').value = data.description || '';
+      document.getElementById('isFeatured').checked = !!data.is_featured;
+      document.getElementById('isHot').checked = !!data.is_hot;
+      document.getElementById('isBestPrice').checked = !!data.is_best_price;
+      document.getElementById('isTopSeller').checked = !!data.is_top_seller;
 
-  window.deleteProduct = async function(id) {
-    if (!confirm('Delete this product permanently?')) return;
-    const { error } = await supabase.from('products').delete().eq('id', id);
-    if (error) alert(error.message);
-    else loadProducts();
-  };
+      if (data.category_id) {
+        const { data: cat } = await supabase.from('categories').select('name').eq('id', data.category_id).single();
+        document.getElementById('categoryName').value = cat ? cat.name : '';
+      } else {
+        document.getElementById('categoryName').value = '';
+      }
 
-  loadProducts();
-</script>
+      existingImages = data.images || (data.main_image_url ? [data.main_image_url] : []);
+      selectedFiles = [];
+      renderPreviews();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    cancelEdit.addEventListener('click', resetForm);
+
+    function resetForm() {
+      editingId = null;
+      form.reset();
+      selectedFiles = [];
+      existingImages = [];
+      imagePreview.innerHTML = '';
+      photoStatus.textContent = '';
+      document.getElementById('formTitle').textContent = 'Add New Product';
+      submitBtn.textContent = 'Publish Product';
+      cancelEdit.classList.add('hidden');
+      document.getElementById('status').value = 'published';
+      document.getElementById('country').value = 'China';
+      document.getElementById('moq').value = 1;
+    }
+
+    // ====================== DELETE ======================
+    window.deleteProduct = async function (id) {
+      if (!confirm('Delete this product permanently?')) return;
+      const { error } = await supabase.from('products').delete().eq('id', id);
+      if (error) alert(error.message);
+      else loadProducts();
+    };
+
+    // ====================== START ======================
+    loadProducts();
+  </script>
 </body>
 </html>
