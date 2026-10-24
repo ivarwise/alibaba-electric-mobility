@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Admin - Electric Mobility</title>
+<title>Admin Dashboard</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -14,7 +14,6 @@
 </head>
 <body class="bg-gray-100">
 
-<!-- Header -->
 <header class="bg-white border-b sticky top-0 z-50">
   <div class="max-w-lg mx-auto px-4 py-3 flex justify-between items-center">
     <div class="font-bold text-orange-600 text-lg">Admin Dashboard</div>
@@ -24,20 +23,17 @@
 
 <main class="max-w-lg mx-auto px-4 py-5 space-y-5">
 
-  <!-- FORM CARD -->
   <div class="bg-white rounded-2xl shadow-sm border p-5">
     <h2 id="formTitle" class="text-lg font-bold mb-4">Add New Product</h2>
 
     <form id="productForm" class="space-y-4">
 
-      <!-- Title -->
       <div>
         <label class="block text-xs font-semibold text-gray-600 mb-1">Product Name *</label>
         <input type="text" id="title" required placeholder="e.g. Electric Mountain Bike 750W"
                class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
       </div>
 
-      <!-- Prices -->
       <div class="grid grid-cols-2 gap-3">
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1">Min Price ($)</label>
@@ -51,7 +47,6 @@
         </div>
       </div>
 
-      <!-- MOQ + Country -->
       <div class="grid grid-cols-2 gap-3">
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1">MOQ</label>
@@ -65,14 +60,12 @@
         </div>
       </div>
 
-      <!-- Category - FREE TEXT -->
       <div>
         <label class="block text-xs font-semibold text-gray-600 mb-1">Category (type freely)</label>
         <input type="text" id="categoryName" placeholder="Electric Bikes, Batteries, Scooters..."
                class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
       </div>
 
-      <!-- Status -->
       <div>
         <label class="block text-xs font-semibold text-gray-600 mb-1">Status</label>
         <select id="status" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
@@ -81,7 +74,6 @@
         </select>
       </div>
 
-      <!-- Flags -->
       <div class="flex flex-wrap gap-4 text-sm pt-1">
         <label class="flex items-center gap-2"><input type="checkbox" id="isFeatured" class="rounded"> Featured</label>
         <label class="flex items-center gap-2"><input type="checkbox" id="isHot" class="rounded"> Hot</label>
@@ -89,30 +81,29 @@
         <label class="flex items-center gap-2"><input type="checkbox" id="isTopSeller" class="rounded"> Top Seller</label>
       </div>
 
-      <!-- Description -->
       <div>
         <label class="block text-xs font-semibold text-gray-600 mb-1">Long Description</label>
         <textarea id="description" rows="4" placeholder="Write full product details here..."
                   class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500"></textarea>
       </div>
 
-      <!-- PHOTO UPLOAD - WORKS ON IPHONE -->
+      <!-- ===================== PHOTO SELECTOR - iOS FIXED ===================== -->
       <div>
         <label class="block text-xs font-semibold text-gray-600 mb-1">Photos (max 10)</label>
-        
-        <button type="button" id="pickPhotosBtn"
-                class="w-full border-2 border-dashed border-gray-300 rounded-2xl py-8 text-center bg-gray-50 active:bg-orange-50">
+
+        <!-- THIS is the only reliable way on iOS -->
+        <label for="imageInput"
+               class="w-full border-2 border-dashed border-gray-300 rounded-2xl py-8 text-center bg-gray-50 block cursor-pointer active:bg-orange-50">
           <i class="fa-solid fa-camera text-3xl text-gray-400 mb-2"></i>
-          <div class="text-sm font-medium text-gray-700">Tap to select photos</div>
+          <div class="text-sm font-medium text-gray-700">Tap to select photos from gallery</div>
           <div class="text-xs text-gray-400 mt-1">You can select multiple photos</div>
-        </button>
+        </label>
 
         <input type="file" id="imageInput" accept="image/*" multiple class="hidden">
 
         <div id="imagePreview" class="flex flex-wrap gap-2 mt-3"></div>
       </div>
 
-      <!-- Submit -->
       <button type="submit" id="submitBtn"
               class="w-full bg-orange-500 active:bg-orange-600 text-white font-bold py-3.5 rounded-xl text-sm">
         Publish Product
@@ -137,32 +128,24 @@
 </main>
 
 <script>
-  // ====================== SUPABASE ======================
   const SUPABASE_URL = 'https://zgbdhpebmjokbaeflqhj.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_m5osddO3GFnJlQYIvSHS3Q_WqF72WwV';
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // ====================== STATE ======================
   let selectedFiles = [];
   let existingImages = [];
   let editingId = null;
 
-  // ====================== DOM ======================
-  const pickBtn = document.getElementById('pickPhotosBtn');
   const imageInput = document.getElementById('imageInput');
   const imagePreview = document.getElementById('imagePreview');
   const form = document.getElementById('productForm');
   const submitBtn = document.getElementById('submitBtn');
   const cancelEdit = document.getElementById('cancelEdit');
 
-  // ====================== PHOTO PICKER (iOS FIXED) ======================
-  pickBtn.addEventListener('click', function() {
-    imageInput.click();
-  });
-
+  // ====================== PHOTO HANDLING ======================
   imageInput.addEventListener('change', function(e) {
     const files = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
-    
+
     if (selectedFiles.length + existingImages.length + files.length > 10) {
       alert('Maximum 10 photos allowed');
       return;
@@ -170,13 +153,12 @@
 
     selectedFiles = selectedFiles.concat(files);
     renderPreviews();
-    imageInput.value = ''; // important for iOS
+    // Do NOT clear the input value on iOS - it can break subsequent selections
   });
 
   function renderPreviews() {
     imagePreview.innerHTML = '';
 
-    // Existing images
     existingImages.forEach((url, i) => {
       const div = document.createElement('div');
       div.className = 'relative';
@@ -188,7 +170,6 @@
       imagePreview.appendChild(div);
     });
 
-    // New selected files
     selectedFiles.forEach((file, i) => {
       const reader = new FileReader();
       reader.onload = function(e) {
@@ -215,14 +196,13 @@
     renderPreviews();
   };
 
-  // ====================== UPLOAD IMAGES ======================
+  // ====================== UPLOAD ======================
   async function uploadImages() {
     const urls = [...existingImages];
 
-    for (let i = 0; i < selectedFiles.length; i++) {
-      const file = selectedFiles[i];
+    for (const file of selectedFiles) {
       const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
-      const fileName = Date.now() + '-' + Math.random().toString(36).substring(2) + '.' + ext;
+      const fileName = Date.now() + '-' + Math.random().toString(36).substring(2, 9) + '.' + ext;
       const path = 'products/' + fileName;
 
       const { error } = await supabase.storage
@@ -240,7 +220,6 @@
     return urls;
   }
 
-  // ====================== SUPPLIER ======================
   async function getSupplierId() {
     const { data } = await supabase.from('suppliers').select('id').limit(1).maybeSingle();
     if (data) return data.id;
@@ -256,7 +235,6 @@
     return newSup.id;
   }
 
-  // ====================== CATEGORY ======================
   async function getCategoryId(name) {
     if (!name || !name.trim()) return null;
     const clean = name.trim();
@@ -276,10 +254,7 @@
       is_active: true
     }]).select().single();
 
-    if (error) {
-      console.error('Category error:', error);
-      return null;
-    }
+    if (error) return null;
     return newCat.id;
   }
 
@@ -326,7 +301,7 @@
 
       if (result.error) throw result.error;
 
-      alert(editingId ? 'Product updated successfully!' : 'Product published successfully!');
+      alert(editingId ? 'Product updated!' : 'Product published!');
       resetForm();
       loadProducts();
 
@@ -339,17 +314,14 @@
     }
   });
 
-  // ====================== LOAD PRODUCTS ======================
+  // ====================== LOAD / EDIT / DELETE ======================
   async function loadProducts() {
     const { data, error } = await supabase
       .from('products')
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error(error);
-      return;
-    }
+    if (error) return console.error(error);
 
     const list = data || [];
     document.getElementById('productCount').textContent = list.length + ' products';
@@ -380,7 +352,6 @@
     `).join('');
   }
 
-  // ====================== EDIT ======================
   window.editProduct = async function(id) {
     const { data, error } = await supabase.from('products').select('*').eq('id', id).single();
     if (error || !data) return alert('Product not found');
@@ -431,7 +402,6 @@
     document.getElementById('moq').value = 1;
   }
 
-  // ====================== DELETE ======================
   window.deleteProduct = async function(id) {
     if (!confirm('Delete this product permanently?')) return;
     const { error } = await supabase.from('products').delete().eq('id', id);
@@ -439,7 +409,6 @@
     else loadProducts();
   };
 
-  // ====================== START ======================
   loadProducts();
 </script>
 </body>
