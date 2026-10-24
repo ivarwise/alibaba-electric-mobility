@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Electric Mobility</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        alibaba: { orange: '#ff6600', darkOrange: '#e65c00' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .image-preview { width: 90px; height: 90px; object-fit: cover; border-radius: 8px; }
+        .drag-over { border-color: #ff6600 !important; background: #fff7ed; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <!-- Header -->
+    <header class="bg-white border-b sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <span class="text-xl font-black italic text-alibaba-orange">alibaba</span>
+                <span class="text-sm font-semibold text-gray-600">Admin Dashboard</span>
+            </div>
+            <a href="index.html" target="_blank" class="text-sm text-alibaba-orange font-medium hover:underline">
+                View Public Site →
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- LEFT: Add / Edit Form -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-xl shadow-sm border p-5 sticky top-20">
+                <h2 class="text-lg font-bold mb-4" id="formTitle">Add New Product</h2>
+
+                <form id="productForm" class="space-y-4">
+                    <input type="hidden" id="productId">
+
+                    <!-- Title -->
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Product Name *</label>
+                        <input type="text" id="title" required
+                               class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-alibaba-orange"
+                               placeholder="e.g. Electric Mountain Bike 750W">
+                    </div>
+
+                    <!-- Price -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Min Price ($)</label>
+                            <input type="number" id="priceMin" step="0.01" min="0"
+                                   class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-alibaba-orange">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Max Price ($)</label>
+                            <input type="number" id="priceMax" step="0.01" min="0"
+                                   class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-alibaba-orange">
+                        </div>
+                    </div>
+
+                    <!-- MOQ -->
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">MOQ (Minimum Order)</label>
+                        <input type="number" id="moq" value="1" min="1"
+                               class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-alibaba-orange">
+                    </div>
+
+                    <!-- Category -->
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Category</label>
+                        <select id="categoryId" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-alibaba-orange">
+                            <option value="">Select category</option>
+                        </select>
+                    </div>
+
+                    <!-- Country -->
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Country</label>
+                        <input type="text" id="country" value="China"
+                               class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-alibaba-orange">
+                    </div>
+
+                    <!-- Status -->
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Status</label>
+                        <select id="status" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-alibaba-orange">
+                            <option value="draft">Draft (hidden)</option>
+                            <option value="published">Published (live)</option>
+                        </select>
+                    </div>
+
+                    <!-- Flags -->
+                    <div class="flex flex-wrap gap-3 text-xs">
+                        <label class="flex items-center gap-1.5 cursor-pointer">
+                            <input type="checkbox" id="isFeatured"> Featured
+                        </label>
+                        <label class="flex items-center gap-1.5 cursor-pointer">
+                            <input type="checkbox" id="isHot"> Hot
+                        </label>
+                        <label class="flex items-center gap-1.5 cursor-pointer">
+                            <input type="checkbox" id="isBestPrice"> Best Price
+                        </label>
+                        <label class="flex items-center gap-1.5 cursor-pointer">
+                            <input type="checkbox" id="isTopSeller"> Top Seller
+                        </label>
+                    </div>
+
+                    <!-- Long Description -->
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Long Description</label>
+                        <textarea id="description" rows="5"
+                                  class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-alibaba-orange"
+                                  placeholder="Write detailed product description..."></textarea>
+                    </div>
+
+                    <!-- Image Upload -->
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">
+                            Photos (5–10 recommended)
+                        </label>
+                        <div id="dropZone"
+                             class="border-2 border-dashed border-gray-300 rounded-lg p-5 text-center cursor-pointer hover:border-alibaba-orange transition">
+                            <i class="fa-solid fa-cloud-arrow-up text-2xl text-gray-400 mb-2"></i>
+                            <p class="text-xs text-gray-500">Click or drag images here</p>
+                            <p class="text-[10px] text-gray-400 mt-1">Max 10 images • JPG/PNG</p>
+                            <input type="file" id="imageInput" accept="image/*" multiple class="hidden">
+                        </div>
+
+                        <!-- Preview -->
+                        <div id="imagePreview" class="flex flex-wrap gap-2 mt-3"></div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="flex gap-2 pt-2">
+                        <button type="submit" id="submitBtn"
+                                class="flex-1 bg-alibaba-orange hover:bg-alibaba-darkOrange text-white font-semibold py-2.5 rounded-lg text-sm transition">
+                            Publish Product
+                        </button>
+                        <button type="button" id="cancelEdit" class="hidden px-4 py-2.5 border rounded-lg text-sm hover:bg-gray-50">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- RIGHT: Products List -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-xl shadow-sm border p-5">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-bold">All Products</h2>
+                    <span id="productCount" class="text-xs text-gray-500">0 products</span>
+                </div>
+
+                <div id="productsList" class="space-y-3">
+                    <!-- Products will load here -->
+                </div>
+
+                <div id="emptyList" class="text-center py-16 text-gray-400">
+                    <i class="fa-solid fa-box-open text-4xl mb-3"></i>
+                    <p>No products yet. Add your first product.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // ====================== SUPABASE ======================
+        const SUPABASE_URL = 'https://zgbdhpebmjokbaeflqhj.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_m5osddO3GFnJlQYIvSHS3Q_WqF72WwV';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // ====================== STATE ======================
+        let selectedFiles = [];          // new files to upload
+        let existingImages = [];         // already uploaded urls (when editing)
+        let editingId = null;
+
+        // ====================== DOM ======================
+        const form = document.getElementById('productForm');
+        const imageInput = document.getElementById('imageInput');
+        const dropZone = document.getElementById('dropZone');
+        const imagePreview = document.getElementById('imagePreview');
+        const productsList = document.getElementById('productsList');
+        const emptyList = document.getElementById('emptyList');
+        const formTitle = document.getElementById('formTitle');
+        const submitBtn = document.getElementById('submitBtn');
+        const cancelEdit = document.getElementById('cancelEdit');
+
+        // ====================== IMAGE HANDLING ======================
+        dropZone.addEventListener('click', () => imageInput.click());
+
+        dropZone.addEventListener('dragover', e => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        imageInput.addEventListener('change', e => handleFiles(e.target.files));
+
+        function handleFiles(files) {
+            const arr = Array.from(files).filter(f => f.type.startsWith('image/'));
+            const total = selectedFiles.length + existingImages.length + arr.length;
+            if (total > 10) {
+                alert('Maximum 10 photos allowed');
+                return;
+            }
+            selectedFiles = [...selectedFiles, ...arr];
+            renderPreviews();
+        }
+
+        function renderPreviews() {
+            imagePreview.innerHTML = '';
+
+            // Existing images (when editing)
+            existingImages.forEach((url, i) => {
+                imagePreview.innerHTML += `
+                    <div class="relative">
+                        <img src="${url}" class="image-preview border">
+                        <button type="button" onclick="removeExisting(${i})"
+                                class="absolute -top-1 -right-1 bg-red-500 text-white w-5 h-5 rounded-full text-xs flex items-center justify-center">×</button>
+                    </div>`;
+            });
+
+            // New selected files
+            selectedFiles.forEach((file, i) => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const div = document.createElement('div');
+                    div.className = 'relative';
+                    div.innerHTML = `
+                        <img src="${e.target.result}" class="image-preview border">
+                        <button type="button" onclick="removeNew(${i})"
+                                class="absolute -top-1 -right-1 bg-red-500 text-white w-5 h-5 rounded-full text-xs flex items-center justify-center">×</button>`;
+                    imagePreview.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        window.removeExisting = (i) => {
+            existingImages.splice(i, 1);
+            renderPreviews();
+        };
+        window.removeNew = (i) => {
+            selectedFiles.splice(i, 1);
+            renderPreviews();
+        };
+
+        // ====================== UPLOAD IMAGES ======================
+        async function uploadImages() {
+            const urls = [...existingImages];
+
+            for (const file of selectedFiles) {
+                const ext = file.name.split('.').pop();
+                const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+                const path = `products/${fileName}`;
+
+                const { error } = await supabase.storage
+                    .from('product-images')
+                    .upload(path, file, { cacheControl: '3600', upsert: false });
+
+                if (error) {
+                    console.error('Upload error:', error);
+                    alert('Image upload failed: ' + error.message);
+                    continue;
+                }
+
+                const { data } = supabase.storage.from('product-images').getPublicUrl(path);
+                urls.push(data.publicUrl);
+            }
+            return urls;
+        }
+
+        // ====================== FORM SUBMIT ======================
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Saving...';
+
+            try {
+                const imageUrls = await uploadImages();
+                if (imageUrls.length === 0) {
+                    alert('Please add at least 1 photo');
+                    return;
+                }
+
+                const payload = {
+                    title: document.getElementById('title').value.trim(),
+                    price_min: parseFloat(document.getElementById('priceMin').value) || null,
+                    price_max: parseFloat(document.getElementById('priceMax').value) || null,
+                    moq: parseInt(document.getElementById('moq').value) || 1,
+                    category_id: document.getElementById('categoryId').value || null,
+                    country: document.getElementById('country').value.trim() || 'China',
+                    status: document.getElementById('status').value,
+                    is_featured: document.getElementById('isFeatured').checked,
+                    is_hot: document.getElementById('isHot').checked,
+                    is_best_price: document.getElementById('isBestPrice').checked,
+                    is_top_seller: document.getElementById('isTopSeller').checked,
+                    description: document.getElementById('description').value.trim(),
+                    main_image_url: imageUrls[0],
+                    images: imageUrls,
+                    // temporary supplier (you can improve later)
+                    supplier_id: await getOrCreateDefaultSupplier()
+                };
+
+                let error;
+                if (editingId) {
+                    ({ error } = await supabase.from('products').update(payload).eq('id', editingId));
+                } else {
+                    ({ error } = await supabase.from('products').insert([payload]));
+                }
+
+                if (error) throw error;
+
+                resetForm();
+                loadProducts();
+                alert(editingId ? 'Product updated!' : 'Product published!');
+            } catch (err) {
+                console.error(err);
+                alert('Error: ' + err.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = editingId ? 'Update Product' : 'Publish Product';
+            }
+        });
+
+        // ====================== DEFAULT SUPPLIER ======================
+        async function getOrCreateDefaultSupplier() {
+            const { data } = await supabase.from('suppliers').select('id').limit(1).single();
+            if (data) return data.id;
+
+            const { data: newSup } = await supabase.from('suppliers').insert([{
+                company_name: 'Default Supplier',
+                country: 'China',
+                is_verified: true,
+                is_active: true
+            }]).select().single();
+            return newSup.id;
+        }
+
+        // ====================== LOAD PRODUCTS ======================
+        async function loadProducts() {
+            const { data, error } = await supabase
+                .from('products')
+                .select('*, categories(name)')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error(error);
+                return;
+            }
+
+            const list = data || [];
+            document.getElementById('productCount').textContent = list.length + ' products';
+
+            if (list.length === 0) {
+                productsList.innerHTML = '';
+                emptyList.style.display = 'block';
+                return;
+            }
+
+            emptyList.style.display = 'none';
+            productsList.innerHTML = list.map(p => `
+                <div class="flex gap-4 p-3 border rounded-lg hover:bg-gray-50 transition">
+                    <img src="${p.main_image_url || 'https://via.placeholder.com/80'}" 
+                         class="w-20 h-20 object-cover rounded-lg border flex-shrink-0">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between gap-2">
+                            <h3 class="font-semibold text-sm truncate">${p.title}</h3>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full ${
+                                p.status === 'published' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                            }">${p.status}</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-0.5">
+                            $${p.price_min || 0} - $${p.price_max || 0} • MOQ ${p.moq}
+                        </p>
+                        <p class="text-xs text-gray-400 mt-1 line-clamp-1">${p.description || ''}</p>
+                        <div class="flex gap-2 mt-2">
+                            <button onclick="editProduct('${p.id}')" 
+                                    class="text-xs text-blue-600 hover:underline">Edit</button>
+                            <button onclick="deleteProduct('${p.id}')" 
+                                    class="text-xs text-red-600 hover:underline">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ====================== EDIT ======================
+        window.editProduct = async (id) => {
+            const { data, error } = await supabase.from('products').select('*').eq('id', id).single();
+            if (error || !data) return alert('Product not found');
+
+            editingId = id;
+            formTitle.textContent = 'Edit Product';
+            submitBtn.textContent = 'Update Product';
+            cancelEdit.classList.remove('hidden');
+
+            document.getElementById('productId').value = data.id;
+            document.getElementById('title').value = data.title || '';
+            document.getElementById('priceMin').value = data.price_min || '';
+            document.getElementById('priceMax').value = data.price_max || '';
+            document.getElementById('moq').value = data.moq || 1;
+            document.getElementById('categoryId').value = data.category_id || '';
+            document.getElementById('country').value = data.country || 'China';
+            document.getElementById('status').value = data.status || 'draft';
+            document.getElementById('description').value = data.description || '';
+            document.getElementById('isFeatured').checked = data.is_featured || false;
+            document.getElementById('isHot').checked = data.is_hot || false;
+            document.getElementById('isBestPrice').checked = data.is_best_price || false;
+            document.getElementById('isTopSeller').checked = data.is_top_seller || false;
+
+            existingImages = data.images || (data.main_image_url ? [data.main_image_url] : []);
+            selectedFiles = [];
+            renderPreviews();
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        cancelEdit.addEventListener('click', resetForm);
+
+        function resetForm() {
+            editingId = null;
+            form.reset();
+            selectedFiles = [];
+            existingImages = [];
+            imagePreview.innerHTML = '';
+            formTitle.textContent = 'Add New Product';
+            submitBtn.textContent = 'Publish Product';
+            cancelEdit.classList.add('hidden');
+            document.getElementById('status').value = 'draft';
+        }
+
+        // ====================== DELETE ======================
+        window.deleteProduct = async (id) => {
+            if (!confirm('Delete this product permanently?')) return;
+            const { error } = await supabase.from('products').delete().eq('id', id);
+            if (error) alert(error.message);
+            else loadProducts();
+        };
+
+        // ====================== LOAD CATEGORIES ======================
+        async function loadCategories() {
+            const { data } = await supabase
+                .from('categories')
+                .select('id, name')
+                .eq('is_active', true)
+                .order('sort_order');
+
+            const select = document.getElementById('categoryId');
+            (data || []).forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = c.name;
+                select.appendChild(opt);
+            });
+        }
+
+        // ====================== INIT ======================
+        async function init() {
+            await loadCategories();
+            await loadProducts();
+        }
+        init();
+    </script>
+</body>
+</html>
