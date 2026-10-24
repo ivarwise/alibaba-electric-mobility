@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Admin Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     .preview-img { width: 85px; height: 85px; object-fit: cover; border-radius: 10px; }
@@ -14,7 +13,6 @@
 </head>
 <body class="bg-gray-100">
 
-  <!-- Header -->
   <header class="bg-white border-b sticky top-0 z-50">
     <div class="max-w-lg mx-auto px-4 py-3 flex justify-between items-center">
       <div class="font-bold text-orange-600 text-lg">Admin Dashboard</div>
@@ -24,84 +22,72 @@
 
   <main class="max-w-lg mx-auto px-4 py-5 space-y-5">
 
-    <!-- FORM -->
     <div class="bg-white rounded-2xl shadow-sm border p-5">
       <h2 id="formTitle" class="text-lg font-bold mb-4">Add New Product</h2>
 
       <form id="productForm" class="space-y-4">
 
-        <!-- Product Name -->
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1">Product Name *</label>
           <input type="text" id="title" required placeholder="e.g. Electric Mountain Bike 750W"
-                 class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
+                 class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
         </div>
 
-        <!-- Prices -->
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-gray-600 mb-1">Min Price ($)</label>
-            <input type="number" id="priceMin" step="0.01" placeholder="350"
-                   class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
+            <input type="number" id="priceMin" step="0.01" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
           </div>
           <div>
             <label class="block text-xs font-semibold text-gray-600 mb-1">Max Price ($)</label>
-            <input type="number" id="priceMax" step="0.01" placeholder="650"
-                   class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
+            <input type="number" id="priceMax" step="0.01" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
           </div>
         </div>
 
-        <!-- MOQ + Country -->
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-gray-600 mb-1">MOQ</label>
-            <input type="number" id="moq" value="1" min="1"
-                   class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
+            <input type="number" id="moq" value="1" min="1" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
           </div>
           <div>
             <label class="block text-xs font-semibold text-gray-600 mb-1">Country</label>
-            <input type="text" id="country" value="China"
-                   class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
+            <input type="text" id="country" value="China" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
           </div>
         </div>
 
-        <!-- Category - Free text -->
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1">Category (type freely)</label>
-          <input type="text" id="categoryName" placeholder="Electric Bikes, Batteries, Scooters..."
-                 class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
+          <input type="text" id="categoryName" placeholder="Electric Bikes, Batteries..."
+                 class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
         </div>
 
-        <!-- Status -->
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1">Status</label>
-          <select id="status" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
-            <option value="published">Published (show on public site)</option>
+          <select id="status" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
+            <option value="published">Published (show on public)</option>
             <option value="draft">Draft (hidden)</option>
           </select>
         </div>
 
-        <!-- Flags -->
         <div class="flex flex-wrap gap-4 text-sm">
-          <label class="flex items-center gap-2"><input type="checkbox" id="isFeatured" class="rounded"> Featured</label>
-          <label class="flex items-center gap-2"><input type="checkbox" id="isHot" class="rounded"> Hot</label>
-          <label class="flex items-center gap-2"><input type="checkbox" id="isBestPrice" class="rounded"> Best Price</label>
-          <label class="flex items-center gap-2"><input type="checkbox" id="isTopSeller" class="rounded"> Top Seller</label>
+          <label class="flex items-center gap-2"><input type="checkbox" id="isFeatured"> Featured</label>
+          <label class="flex items-center gap-2"><input type="checkbox" id="isHot"> Hot</label>
+          <label class="flex items-center gap-2"><input type="checkbox" id="isBestPrice"> Best Price</label>
+          <label class="flex items-center gap-2"><input type="checkbox" id="isTopSeller"> Top Seller</label>
         </div>
 
-        <!-- Description -->
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1">Long Description</label>
-          <textarea id="description" rows="4" placeholder="Write full product details..."
-                    class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500"></textarea>
+          <textarea id="description" rows="4" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm"
+                    placeholder="Write full product details..."></textarea>
         </div>
 
-        <!-- ================= PHOTO SELECTOR (working method) ================= -->
+        <!-- ========== PHOTO SECTION (exact same method that worked) ========== -->
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1">Photos (max 10)</label>
 
           <label for="imageInput"
-                 class="block w-full border-2 border-dashed border-orange-400 rounded-2xl py-8 text-center bg-gray-50 cursor-pointer active:bg-orange-50">
+                 class="block w-full border-2 border-dashed border-orange-400 rounded-2xl py-8 text-center bg-gray-50 cursor-pointer">
             <div class="text-3xl mb-2">📷</div>
             <div class="font-semibold text-gray-800">Tap to select photos</div>
             <div class="text-xs text-gray-500 mt-1">You can select multiple</div>
@@ -110,12 +96,11 @@
           <input type="file" id="imageInput" accept="image/*" multiple class="hidden">
 
           <div id="imagePreview" class="flex flex-wrap gap-2 mt-3"></div>
-          <p id="photoStatus" class="text-xs text-gray-500 mt-1"></p>
+          <p id="photoStatus" class="text-sm text-gray-600 mt-2 font-medium"></p>
         </div>
 
-        <!-- Submit -->
         <button type="submit" id="submitBtn"
-                class="w-full bg-orange-500 active:bg-orange-600 text-white font-bold py-3.5 rounded-xl text-sm">
+                class="w-full bg-orange-500 text-white font-bold py-3.5 rounded-xl text-sm">
           Publish Product
         </button>
 
@@ -126,7 +111,7 @@
       </form>
     </div>
 
-    <!-- PRODUCTS LIST -->
+    <!-- Products List -->
     <div class="bg-white rounded-2xl shadow-sm border p-5">
       <div class="flex justify-between items-center mb-4">
         <h2 class="font-bold">Your Products</h2>
@@ -139,17 +124,15 @@
   </main>
 
   <script>
-    // ====================== SUPABASE ======================
+    // Supabase
     const SUPABASE_URL = 'https://zgbdhpebmjokbaeflqhj.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_m5osddO3GFnJlQYIvSHS3Q_WqF72WwV';
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // ====================== STATE ======================
     let selectedFiles = [];
     let existingImages = [];
     let editingId = null;
 
-    // ====================== DOM ======================
     const imageInput = document.getElementById('imageInput');
     const imagePreview = document.getElementById('imagePreview');
     const photoStatus = document.getElementById('photoStatus');
@@ -157,12 +140,15 @@
     const submitBtn = document.getElementById('submitBtn');
     const cancelEdit = document.getElementById('cancelEdit');
 
-    // ====================== PHOTO PREVIEW (same working method) ======================
+    // ========== PHOTO HANDLING (same as working test) ==========
     imageInput.addEventListener('change', function () {
-      const files = Array.from(imageInput.files).filter(f => f.type.startsWith('image/'));
+      const files = Array.from(this.files);
+
+      photoStatus.textContent = files.length + ' photo(s) selected - loading previews...';
 
       if (selectedFiles.length + existingImages.length + files.length > 10) {
         alert('Maximum 10 photos allowed');
+        photoStatus.textContent = '';
         return;
       }
 
@@ -173,21 +159,21 @@
     function renderPreviews() {
       imagePreview.innerHTML = '';
       const total = existingImages.length + selectedFiles.length;
-      photoStatus.textContent = total > 0 ? total + ' photo(s) selected' : '';
+      photoStatus.textContent = total + ' photo(s) selected';
 
-      // Existing images (when editing)
+      // Existing images
       existingImages.forEach((url, i) => {
         const div = document.createElement('div');
         div.className = 'relative';
         div.innerHTML = `
           <img src="${url}" class="preview-img border">
           <button type="button" onclick="removeExisting(${i})"
-                  class="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full text-xs flex items-center justify-center">×</button>
+                  class="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full text-xs">×</button>
         `;
         imagePreview.appendChild(div);
       });
 
-      // New selected files
+      // New files
       selectedFiles.forEach((file, i) => {
         const reader = new FileReader();
         reader.onload = function (e) {
@@ -196,9 +182,12 @@
           div.innerHTML = `
             <img src="${e.target.result}" class="preview-img border">
             <button type="button" onclick="removeNew(${i})"
-                    class="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full text-xs flex items-center justify-center">×</button>
+                    class="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full text-xs">×</button>
           `;
           imagePreview.appendChild(div);
+        };
+        reader.onerror = function () {
+          photoStatus.textContent = 'Error loading one of the photos';
         };
         reader.readAsDataURL(file);
       });
@@ -214,23 +203,20 @@
       renderPreviews();
     };
 
-    // ====================== UPLOAD IMAGES ======================
+    // ========== UPLOAD ==========
     async function uploadImages() {
       const urls = [...existingImages];
 
       for (const file of selectedFiles) {
         const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
-        const fileName = Date.now() + '-' + Math.random().toString(36).substring(2, 9) + '.' + ext;
+        const fileName = Date.now() + '-' + Math.random().toString(36).substring(2, 8) + '.' + ext;
         const path = 'products/' + fileName;
 
         const { error } = await supabase.storage
           .from('product-images')
           .upload(path, file, { contentType: file.type });
 
-        if (error) {
-          console.error(error);
-          throw new Error('Image upload failed: ' + error.message);
-        }
+        if (error) throw new Error('Upload failed: ' + error.message);
 
         const { data } = supabase.storage.from('product-images').getPublicUrl(path);
         urls.push(data.publicUrl);
@@ -238,7 +224,6 @@
       return urls;
     }
 
-    // ====================== HELPERS ======================
     async function getSupplierId() {
       const { data } = await supabase.from('suppliers').select('id').limit(1).maybeSingle();
       if (data) return data.id;
@@ -258,26 +243,18 @@
       if (!name || !name.trim()) return null;
       const clean = name.trim();
 
-      const { data } = await supabase
-        .from('categories')
-        .select('id')
-        .ilike('name', clean)
-        .maybeSingle();
-
+      let { data } = await supabase.from('categories').select('id').ilike('name', clean).maybeSingle();
       if (data) return data.id;
 
       const slug = clean.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-      const { data: newCat, error } = await supabase.from('categories').insert([{
-        name: clean,
-        slug: slug,
-        is_active: true
+      const { data: newCat } = await supabase.from('categories').insert([{
+        name: clean, slug: slug, is_active: true
       }]).select().single();
 
-      if (error) return null;
-      return newCat.id;
+      return newCat ? newCat.id : null;
     }
 
-    // ====================== SUBMIT ======================
+    // ========== SUBMIT ==========
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
       submitBtn.disabled = true;
@@ -320,7 +297,7 @@
 
         if (result.error) throw result.error;
 
-        alert(editingId ? 'Product updated successfully!' : 'Product published successfully!');
+        alert(editingId ? 'Product updated!' : 'Product published successfully!');
         resetForm();
         loadProducts();
 
@@ -333,17 +310,14 @@
       }
     });
 
-    // ====================== LOAD PRODUCTS ======================
+    // ========== LOAD / EDIT / DELETE ==========
     async function loadProducts() {
       const { data, error } = await supabase
         .from('products')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error(error);
-        return;
-      }
+      if (error) return console.error(error);
 
       const list = data || [];
       document.getElementById('productCount').textContent = list.length + ' products';
@@ -363,21 +337,20 @@
           <img src="${p.main_image_url || 'https://via.placeholder.com/80'}" class="w-16 h-16 object-cover rounded-xl">
           <div class="flex-1 min-w-0">
             <div class="font-semibold text-sm truncate">${p.title}</div>
-            <div class="text-xs text-gray-500 mt-0.5">$${p.price_min || 0} - $${p.price_max || 0}</div>
+            <div class="text-xs text-gray-500">$${p.price_min || 0} - $${p.price_max || 0}</div>
             <div class="text-xs mt-1 ${p.status === 'published' ? 'text-green-600' : 'text-gray-500'}">${p.status}</div>
-            <div class="flex gap-4 mt-1.5">
-              <button onclick="editProduct('${p.id}')" class="text-xs text-blue-600 font-medium">Edit</button>
-              <button onclick="deleteProduct('${p.id}')" class="text-xs text-red-600 font-medium">Delete</button>
+            <div class="flex gap-4 mt-1">
+              <button onclick="editProduct('${p.id}')" class="text-xs text-blue-600">Edit</button>
+              <button onclick="deleteProduct('${p.id}')" class="text-xs text-red-600">Delete</button>
             </div>
           </div>
         </div>
       `).join('');
     }
 
-    // ====================== EDIT ======================
     window.editProduct = async function (id) {
       const { data, error } = await supabase.from('products').select('*').eq('id', id).single();
-      if (error || !data) return alert('Product not found');
+      if (error || !data) return alert('Not found');
 
       editingId = id;
       document.getElementById('formTitle').textContent = 'Edit Product';
@@ -426,15 +399,14 @@
       document.getElementById('moq').value = 1;
     }
 
-    // ====================== DELETE ======================
     window.deleteProduct = async function (id) {
-      if (!confirm('Delete this product permanently?')) return;
+      if (!confirm('Delete this product?')) return;
       const { error } = await supabase.from('products').delete().eq('id', id);
       if (error) alert(error.message);
       else loadProducts();
     };
 
-    // ====================== START ======================
+    // Start
     loadProducts();
   </script>
 </body>
