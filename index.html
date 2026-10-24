@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Trade Marketplace - Electric Mobility & Industrial Supplies</title>
+    <title>Alibaba Global Trade Marketplace - Admin & Storefront</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Supabase JS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         tailwind.config = {
@@ -17,12 +19,8 @@
                             orange: '#ff6600',
                             darkOrange: '#e65c00',
                             dark: '#222222',
-                            grayBg: '#f5f5f5',
-                            border: '#e5e7eb'
+                            grayBg: '#f5f5f5'
                         }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif']
                     }
                 }
             }
@@ -31,526 +29,412 @@
 </head>
 <body class="bg-alibaba-grayBg font-sans text-gray-800 antialiased">
 
-    <!-- Top Utility Bar -->
-    <div class="bg-gray-100 border-b border-gray-200 text-xs text-gray-600 hidden md:block">
-        <div class="max-w-7xl mx-auto px-4 h-8 flex justify-between items-center">
-            <div class="flex items-center space-x-6">
-                <span class="hover:text-alibaba-orange cursor-pointer">AliBaba Sustainable Energy</span>
-                <span class="hover:text-alibaba-orange cursor-pointer">Partnerships</span>
-                <span class="hover:text-alibaba-orange cursor-pointer">Sourcing Solutions</span>
-                <span class="hover:text-alibaba-orange cursor-pointer">Sell on Alibaba</span>
-            </div>
-            <div class="flex items-center space-x-6">
-                <div class="flex items-center space-x-1 cursor-pointer hover:text-alibaba-orange">
-                    <img src="https://flagcdn.com/w20/us.png" alt="US Flag" class="w-4 h-3 inline">
-                    <span>USD - $</span>
-                </div>
-                <div class="cursor-pointer hover:text-alibaba-orange">English</div>
-                <div class="cursor-pointer hover:text-alibaba-orange">Buyer Central</div>
-                <div class="cursor-pointer hover:text-alibaba-orange">Help</div>
-            </div>
+    <!-- Top Toggle Bar -->
+    <div class="bg-gray-900 text-white text-xs py-2 px-4 flex flex-wrap justify-between items-center sticky top-0 z-50 shadow-md gap-2">
+        <div class="flex items-center gap-3">
+            <span class="font-bold tracking-wider text-alibaba-orange">ALIBABA PLATFORM</span>
+            <span id="dbStatus" class="bg-green-500 text-white px-2 py-0.5 rounded text-[10px] font-semibold">DB: Connected</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="switchView('public')" id="btnPublic" class="bg-alibaba-orange px-3 py-1 rounded font-semibold transition">Public Storefront</button>
+            <button onclick="switchView('admin')" id="btnAdmin" class="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded font-semibold transition">Admin Dashboard</button>
         </div>
     </div>
 
-    <!-- Main Header -->
-    <header class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-            <div class="flex items-center gap-8">
-                <a href="#" class="flex items-center">
+    <!-- ================= PUBLIC STOREFRONT VIEW ================= -->
+    <div id="publicView" class="block">
+        <!-- Top Utility Bar -->
+        <div class="bg-gray-100 border-b border-gray-200 text-xs text-gray-600 hidden md:block">
+            <div class="max-w-7xl mx-auto px-4 h-8 flex justify-between items-center">
+                <div class="flex items-center space-x-6">
+                    <span>AliBaba Sustainable Energy</span>
+                    <span>Partnerships</span>
+                    <span>Sourcing Solutions</span>
+                    <span>Sell on Alibaba</span>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <span>USD - $</span>
+                    <span>English</span>
+                    <span>Buyer Central</span>
+                    <span>Help</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Header & Search Bar -->
+        <header class="bg-white border-b border-gray-200 sticky top-9 z-40 shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-8">
                     <span class="text-2xl font-black italic tracking-tighter text-alibaba-orange">alibaba</span>
-                    <span class="text-[10px] text-gray-500 font-medium ml-1 leading-tight hidden sm:inline">Global Trade Starts Here</span>
-                </a>
-            </div>
-            <div class="flex-1 max-w-2xl hidden md:flex items-center">
-                <div class="relative flex items-center w-full border-2 border-alibaba-orange rounded-full overflow-hidden bg-white">
-                    <div class="pl-4 pr-2 text-gray-400"><i class="fa-solid fa-bars text-xs"></i></div>
-                    <select class="bg-transparent text-xs font-medium text-gray-700 py-2.5 pr-2 outline-none cursor-pointer border-r border-gray-200">
-                        <option>Products</option>
-                        <option>Suppliers</option>
-                    </select>
-                    <input type="text" placeholder="Search for electric cars, bikes, motorcycles, batteries, suppliers..." class="w-full px-4 py-2.5 text-sm outline-none text-gray-700">
-                    <button class="bg-alibaba-orange hover:bg-alibaba-darkOrange text-white px-8 py-2.5 font-medium text-sm transition flex items-center gap-2">
-                        <i class="fa-solid fa-magnifying-glass"></i> Search
-                    </button>
+                    <span class="text-[10px] text-gray-500 font-medium hidden sm:inline">Global Trade Starts Here</span>
                 </div>
-            </div>
-            <div class="flex items-center space-x-6 text-xs text-gray-700">
-                <div class="flex items-center gap-2 cursor-pointer hover:text-alibaba-orange">
-                    <div class="relative">
-                        <i class="fa-regular fa-message text-lg"></i>
-                        <span class="absolute -top-1.5 -right-2 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
+                <div class="flex-1 max-w-2xl hidden md:flex items-center">
+                    <div class="relative flex items-center w-full border-2 border-alibaba-orange rounded-full overflow-hidden bg-white">
+                        <input type="text" id="searchInput" placeholder="Search for electric cars, bikes, motorcycles, batteries..." class="w-full px-4 py-2 text-sm outline-none">
+                        <button class="bg-alibaba-orange text-white px-6 py-2 text-sm font-medium"><i class="fa-solid fa-magnifying-glass"></i></button>
                     </div>
-                    <span class="hidden lg:inline">Messages</span>
                 </div>
-                <div class="flex items-center gap-2 cursor-pointer hover:text-alibaba-orange">
-                    <div class="relative">
-                        <i class="fa-regular fa-bell text-lg"></i>
-                        <span class="absolute -top-1.5 -right-2 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
+                <div class="flex items-center space-x-5 text-xs text-gray-700">
+                    <div class="flex items-center gap-1 cursor-pointer"><i class="fa-regular fa-message text-base"></i><span>Messages</span></div>
+                    <div class="flex items-center gap-1 cursor-pointer"><i class="fa-regular fa-bell text-base"></i><span>Notifications</span></div>
+                    <div class="flex items-center gap-1 cursor-pointer"><i class="fa-solid fa-cart-shopping text-base"></i><span>Cart</span></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Body Grid -->
+        <main class="max-w-7xl mx-auto px-4 py-4 grid grid-cols-1 lg:grid-cols-12 gap-5">
+            <!-- Left Categories Sidebar -->
+            <aside class="lg:col-span-3 space-y-4">
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                    <div class="text-xs font-bold text-gray-900 uppercase tracking-wider mb-2 px-2 flex items-center gap-2">
+                        <i class="fa-solid fa-list text-alibaba-orange"></i> Categories
                     </div>
-                    <span class="hidden lg:inline">Notifications</span>
-                </div>
-                <div class="flex items-center gap-2 cursor-pointer hover:text-alibaba-orange">
-                    <i class="fa-solid fa-cart-shopping text-lg"></i>
-                    <span class="hidden lg:inline">Cart</span>
-                </div>
-                <div class="flex items-center gap-2 pl-2 border-l border-gray-200 cursor-pointer">
-                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces" alt="John Carter" class="w-8 h-8 rounded-full object-cover border border-gray-300">
-                    <div class="hidden xl:block text-left">
-                        <div class="font-semibold text-gray-900 leading-tight">John Carter</div>
-                        <div class="text-[10px] text-gray-500">Buyer Account</div>
-                    </div>
-                    <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
-                </div>
-            </div>
-        </div>
-        <div class="border-t border-gray-100 bg-white">
-            <div class="max-w-7xl mx-auto px-4 flex items-center space-x-8 text-xs font-semibold py-2.5 overflow-x-auto whitespace-nowrap">
-                <div class="flex items-center gap-2 text-alibaba-orange cursor-pointer">
-                    <i class="fa-solid fa-bars text-sm"></i>
-                    <span>All Categories</span>
-                </div>
-                <a href="#" class="text-gray-800 hover:text-alibaba-orange">Sourcing Solutions</a>
-                <a href="#" class="text-gray-800 hover:text-alibaba-orange">Trade Shows</a>
-                <a href="#" class="text-gray-800 hover:text-alibaba-orange">Buyer Central</a>
-                <a href="#" class="text-gray-800 hover:text-alibaba-orange">Sell on Alibaba</a>
-                <a href="#" class="text-gray-800 hover:text-alibaba-orange">Help</a>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 py-4 grid grid-cols-1 lg:grid-cols-12 gap-5">
-
-        <!-- Left Sidebar -->
-        <aside class="lg:col-span-3 space-y-4">
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
-                <div class="text-xs font-bold text-gray-900 uppercase tracking-wider mb-2 px-2 flex items-center gap-2">
-                    <i class="fa-solid fa-list text-alibaba-orange"></i> Categories
-                </div>
-                <ul id="sidebarCategories" class="space-y-1 text-xs font-medium text-gray-700">
-                    <!-- filled by JS -->
-                </ul>
-                <div id="sidebarEmpty" class="text-center py-4 text-gray-400 text-xs">No categories yet</div>
-            </div>
-
-            <div class="relative rounded-lg overflow-hidden shadow-sm bg-gradient-to-b from-blue-900 to-blue-950 text-white p-5 flex flex-col justify-between min-h-[340px]">
-                <div class="relative z-10 space-y-2">
-                    <h3 class="text-lg font-bold leading-snug">Get the Best Electric Mobility Solutions</h3>
-                    <ul class="text-[11px] space-y-1 text-blue-200">
-                        <li><i class="fa-solid fa-check text-alibaba-orange mr-1"></i> Verified suppliers</li>
-                        <li><i class="fa-solid fa-check text-alibaba-orange mr-1"></i> Competitive prices</li>
-                        <li><i class="fa-solid fa-check text-alibaba-orange mr-1"></i> Global shipping</li>
+                    <ul id="publicCategoriesList" class="space-y-1 text-xs font-medium text-gray-700">
+                        <li class="p-2 text-gray-400 italic">No categories loaded</li>
                     </ul>
                 </div>
-                <div class="relative z-10 mt-4">
-                    <button class="bg-alibaba-orange hover:bg-alibaba-darkOrange text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow transition flex items-center gap-2">
-                        Start Sourcing <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                    </button>
-                </div>
-                <div class="absolute bottom-0 right-0 opacity-40 translate-x-4 translate-y-4 pointer-events-none">
-                    <img src="https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=300&q=80" alt="Bike" class="w-48 object-cover rounded">
-                </div>
-            </div>
-        </aside>
+            </aside>
 
-        <!-- Center -->
-        <section class="lg:col-span-6 space-y-5">
-            <!-- Hero -->
-            <div class="relative rounded-xl overflow-hidden shadow-sm bg-gradient-to-r from-gray-900 via-gray-900 to-blue-950 text-white p-6 md:p-8 flex flex-col justify-between min-h-[300px]">
-                <div class="absolute inset-0 opacity-35 bg-cover bg-center mix-blend-overlay" style="background-image: url('https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=1000&q=80');"></div>
-                <div class="relative z-10 max-w-lg space-y-3">
-                    <span class="text-xs uppercase tracking-widest text-orange-400 font-bold">Global B2B Marketplace</span>
-                    <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight leading-tight">Power the Future of Electric Mobility</h1>
-                    <p class="text-xs text-gray-300 leading-relaxed">Discover verified manufacturers, compare wholesale prices, and source electric vehicles and components globally.</p>
-                </div>
-                <div class="relative z-10 flex flex-wrap items-center gap-3 pt-4">
-                    <button class="bg-alibaba-orange hover:bg-alibaba-darkOrange text-white text-xs font-semibold px-5 py-2.5 rounded-full shadow transition">
-                        Explore Products <i class="fa-solid fa-arrow-right ml-1"></i>
-                    </button>
-                    <button class="bg-white/10 hover:bg-white/20 text-white text-xs font-semibold px-5 py-2.5 rounded-full backdrop-blur border border-white/20 transition">
-                        Find Suppliers
-                    </button>
-                </div>
-                <div class="absolute top-4 right-4 hidden sm:flex flex-col gap-2 text-[10px] text-right font-medium">
-                    <div class="bg-black/40 backdrop-blur px-3 py-1 rounded-full border border-white/10 flex items-center gap-2 justify-end">
-                        <span>Verified Suppliers</span> <i class="fa-solid fa-shield-halved text-alibaba-orange"></i>
-                    </div>
-                    <div class="bg-black/40 backdrop-blur px-3 py-1 rounded-full border border-white/10 flex items-center gap-2 justify-end">
-                        <span>Global Shipping</span> <i class="fa-solid fa-globe text-alibaba-orange"></i>
-                    </div>
-                    <div class="bg-black/40 backdrop-blur px-3 py-1 rounded-full border border-white/10 flex items-center gap-2 justify-end">
-                        <span>Secure Payments</span> <i class="fa-solid fa-lock text-alibaba-orange"></i>
+            <!-- Center Content -->
+            <section class="lg:col-span-9 space-y-5">
+                <!-- Hero Banner -->
+                <div class="relative rounded-xl overflow-hidden shadow-sm bg-gradient-to-r from-gray-900 via-gray-900 to-blue-950 text-white p-6 md:p-8 flex flex-col justify-between min-h-[260px]">
+                    <div class="relative z-10 max-w-lg space-y-3">
+                        <span class="text-xs uppercase tracking-widest text-orange-400 font-bold">Global B2B Marketplace</span>
+                        <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight leading-tight">Power the Future of Electric Mobility</h1>
+                        <p class="text-xs text-gray-300 leading-relaxed">Discover verified manufacturers, compare wholesale prices, and source electric vehicles and components globally.</p>
                     </div>
                 </div>
+
+                <!-- Featured Products Section -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                    <div class="flex items-center justify-between mb-4 border-b pb-2">
+                        <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wide">Featured Products</h2>
+                        <span class="text-xs text-alibaba-orange font-semibold">Live Database Feed</span>
+                    </div>
+
+                    <!-- Products Grid -->
+                    <div id="publicProductsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        <!-- Dynamic items -->
+                    </div>
+
+                    <!-- Empty State (Shows when database has zero published products) -->
+                    <div id="publicEmptyState" class="text-center py-12 text-gray-400 border border-dashed border-gray-200 rounded-lg">
+                        <i class="fa-solid fa-box-archive text-3xl mb-2 text-gray-300"></i>
+                        <p class="text-sm font-medium text-gray-600">No products posted yet.</p>
+                        <p class="text-xs text-gray-400 mt-1">Products will only appear here once you post and publish them from the <span class="text-alibaba-orange font-bold cursor-pointer" onclick="switchView('admin')">Admin Dashboard</span>.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ================= ADMIN DASHBOARD VIEW ================= -->
+    <div id="adminView" class="hidden max-w-4xl mx-auto px-4 py-8 space-y-6">
+        <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 space-y-6">
+            <div class="flex justify-between items-center border-b pb-4">
+                <h1 class="text-xl font-black text-gray-900 flex items-center gap-2">
+                    <i class="fa-solid fa-gauge-high text-alibaba-orange"></i> Admin Product Posting Portal
+                </h1>
+                <button onclick="loadAdminData()" class="bg-gray-100 hover:bg-gray-200 text-xs font-bold px-3 py-1.5 rounded"><i class="fa-solid fa-rotate"></i> Refresh Data</button>
             </div>
 
-            <!-- Category Grid -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <div id="categoryGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
-                <div id="categoryEmptyState" class="text-center py-6 text-gray-400 text-xs">
-                    <i class="fa-solid fa-folder-open text-2xl mb-1 text-gray-300"></i>
-                    <p>No category shortcuts published yet. Publish items from your backend dashboard.</p>
+            <!-- SUPPLIER SELECTOR -->
+            <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 space-y-3">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xs font-bold text-gray-900 uppercase tracking-wide"><i class="fa-solid fa-store text-alibaba-orange"></i> Select or Create Supplier Profile</h3>
+                    <button onclick="toggleNewSupplierForm()" class="text-xs text-alibaba-orange font-bold hover:underline">+ Create New Supplier</button>
+                </div>
+                
+                <div id="supplierSelectContainer">
+                    <select id="adminSupplierId" class="w-full text-sm border border-gray-300 rounded-lg p-2.5 bg-white outline-none">
+                        <option value="">-- Loading suppliers... --</option>
+                    </select>
+                </div>
+
+                <div id="newSupplierForm" class="hidden pt-3 border-t border-orange-200 space-y-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <input type="text" id="supCompanyName" placeholder="Company Name (e.g. Shenzhen EV Tech Co.)" class="text-xs border rounded p-2">
+                        <input type="text" id="supCountry" placeholder="Country" class="text-xs border rounded p-2" value="China">
+                    </div>
+                    <button type="button" onclick="createSupplierInDB()" class="bg-gray-900 hover:bg-black text-white text-xs font-bold px-4 py-2 rounded">Save Supplier to DB</button>
                 </div>
             </div>
 
-            <!-- Featured Products -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wide">Featured Products</h2>
-                    <a href="#" class="text-xs text-alibaba-orange font-semibold hover:underline flex items-center gap-1">
-                        View All Products <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                    </a>
-                </div>
-                <div id="featuredProductsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
-                <div id="productsEmptyState" class="text-center py-12 text-gray-400 border border-dashed border-gray-200 rounded-lg">
-                    <i class="fa-solid fa-box-archive text-3xl mb-2 text-gray-300"></i>
-                    <p class="text-sm font-medium text-gray-600">No products posted yet.</p>
-                    <p class="text-xs text-gray-400 mt-1">Once you add and publish products from your backend database, they will appear here instantly.</p>
-                </div>
-            </div>
+            <!-- PRODUCT POSTING FORM -->
+            <form id="productForm" onsubmit="handleProductSubmit(event)" class="space-y-4 pt-2">
+                <h3 class="text-xs font-bold text-gray-900 uppercase tracking-wide border-b pb-2"><i class="fa-solid fa-plus text-alibaba-orange"></i> Post New Product</h3>
 
-            <!-- Verified Suppliers -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wide">Verified Suppliers</h2>
-                    <a href="#" class="text-xs text-alibaba-orange font-semibold hover:underline flex items-center gap-1">
-                        View All Suppliers <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                    </a>
-                </div>
-                <div id="verifiedSuppliersGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
-                <div id="suppliersEmptyState" class="text-center py-10 text-gray-400 border border-dashed border-gray-200 rounded-lg">
-                    <i class="fa-solid fa-store-slash text-3xl mb-2 text-gray-300"></i>
-                    <p class="text-sm font-medium text-gray-600">No verified suppliers listed yet.</p>
-                    <p class="text-xs text-gray-400 mt-1">Suppliers published via your backend will display here.</p>
-                </div>
-            </div>
-
-            <!-- Wholesale strip -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-                <div class="flex items-start gap-2.5">
-                    <i class="fa-solid fa-tags text-alibaba-orange text-lg mt-0.5"></i>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <div class="font-bold text-gray-900">Bulk Order Discounts</div>
-                        <div class="text-gray-500 text-[11px]">Save more with larger quantities</div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Product Title *</label>
+                        <input type="text" id="pTitle" required placeholder="e.g. Kawasaki Ninja 500 Sport Motorcycle" class="w-full text-sm border rounded-lg p-2.5 outline-none focus:border-alibaba-orange">
                     </div>
-                </div>
-                <div class="flex items-start gap-2.5">
-                    <i class="fa-solid fa-pen-ruler text-alibaba-orange text-lg mt-0.5"></i>
                     <div>
-                        <div class="font-bold text-gray-900">Custom Manufacturing</div>
-                        <div class="text-gray-500 text-[11px]">Your design, our production</div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Category</label>
+                        <select id="pCategoryId" class="w-full text-sm border rounded-lg p-2.5 outline-none bg-white">
+                            <option value="">-- Select Category --</option>
+                        </select>
                     </div>
                 </div>
-                <div class="flex items-start gap-2.5">
-                    <i class="fa-solid fa-box-open text-alibaba-orange text-lg mt-0.5"></i>
+
+                <div class="grid grid-cols-3 gap-3">
                     <div>
-                        <div class="font-bold text-gray-900">Sample Orders</div>
-                        <div class="text-gray-500 text-[11px]">Test before you buy</div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Min Price ($) *</label>
+                        <input type="number" step="0.01" id="pMinPrice" required placeholder="4500" class="w-full text-sm border rounded-lg p-2.5">
                     </div>
-                </div>
-                <div class="flex items-start gap-2.5">
-                    <i class="fa-solid fa-earth-americas text-alibaba-orange text-lg mt-0.5"></i>
                     <div>
-                        <div class="font-bold text-gray-900">Global Shipping</div>
-                        <div class="text-gray-500 text-[11px]">To over 100 countries</div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Max Price ($) *</label>
+                        <input type="number" step="0.01" id="pMaxPrice" required placeholder="5800" class="w-full text-sm border rounded-lg p-2.5">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">MOQ (Units)</label>
+                        <input type="number" id="pMoq" value="1" class="w-full text-sm border rounded-lg p-2.5">
                     </div>
                 </div>
-            </div>
-        </section>
 
-        <!-- Right Sidebar -->
-        <aside class="lg:col-span-3 space-y-4">
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 space-y-3">
-                <div class="font-bold text-sm text-gray-900">Welcome back, John!</div>
-                <div class="text-[11px] text-gray-500">Here's your trading overview</div>
-                <div class="grid grid-cols-2 gap-2 pt-1">
-                    <div class="bg-gray-50 p-2.5 rounded border border-gray-100">
-                        <div class="text-[10px] text-gray-500">Active Orders</div>
-                        <div class="text-lg font-bold text-gray-900">0</div>
-                        <a href="#" class="text-[10px] text-alibaba-orange font-semibold flex items-center gap-1 mt-1">View All <i class="fa-solid fa-arrow-right text-[8px]"></i></a>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Status</label>
+                        <select id="pStatus" class="w-full text-sm border rounded-lg p-2.5 bg-white">
+                            <option value="published" selected>Published (Visible on Public Storefront)</option>
+                            <option value="draft">Draft (Hidden)</option>
+                            <option value="pending">Pending</option>
+                        </select>
                     </div>
-                    <div class="bg-gray-50 p-2.5 rounded border border-gray-100">
-                        <div class="text-[10px] text-gray-500">Pending Quotations</div>
-                        <div class="text-lg font-bold text-gray-900">0</div>
-                        <a href="#" class="text-[10px] text-alibaba-orange font-semibold flex items-center gap-1 mt-1">View All <i class="fa-solid fa-arrow-right text-[8px]"></i></a>
-                    </div>
-                    <div class="bg-gray-50 p-2.5 rounded border border-gray-100">
-                        <div class="text-[10px] text-gray-500">Saved Products</div>
-                        <div class="text-lg font-bold text-gray-900">0</div>
-                        <a href="#" class="text-[10px] text-alibaba-orange font-semibold flex items-center gap-1 mt-1">View All <i class="fa-solid fa-arrow-right text-[8px]"></i></a>
-                    </div>
-                    <div class="bg-gray-50 p-2.5 rounded border border-gray-100">
-                        <div class="text-[10px] text-gray-500">Favorite Suppliers</div>
-                        <div class="text-lg font-bold text-gray-900">0</div>
-                        <a href="#" class="text-[10px] text-alibaba-orange font-semibold flex items-center gap-1 mt-1">View All <i class="fa-solid fa-arrow-right text-[8px]"></i></a>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Country / Origin</label>
+                        <input type="text" id="pCountry" value="Japan" class="w-full text-sm border rounded-lg p-2.5">
                     </div>
                 </div>
-            </div>
 
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
-                <div class="text-xs font-bold text-gray-900 mb-2 px-2">Quick Access</div>
-                <ul class="space-y-1 text-xs font-medium text-gray-700">
-                    <li><a href="#" class="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
-                        <div><div class="font-semibold text-gray-800">My Orders</div><div class="text-[10px] text-gray-400">Track & manage orders</div></div>
-                        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
-                    </a></li>
-                    <li><a href="#" class="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
-                        <div><div class="font-semibold text-gray-800">My Quotations</div><div class="text-[10px] text-gray-400">View your quotes</div></div>
-                        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
-                    </a></li>
-                    <li><a href="#" class="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
-                        <div><div class="font-semibold text-gray-800">Supplier Messages</div><div class="text-[10px] text-gray-400">Chat with suppliers</div></div>
-                        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
-                    </a></li>
-                    <li><a href="#" class="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
-                        <div><div class="font-semibold text-gray-800">Favorites</div><div class="text-[10px] text-gray-400">Your saved products</div></div>
-                        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
-                    </a></li>
-                </ul>
-            </div>
-
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 space-y-2">
-                <div class="text-xs font-bold text-gray-900">Popular Searches</div>
-                <div class="flex flex-wrap gap-1.5 text-[11px]">
-                    <span class="bg-gray-100 hover:bg-orange-50 hover:text-alibaba-orange px-2.5 py-1 rounded-full cursor-pointer transition text-gray-600">electric car</span>
-                    <span class="bg-gray-100 hover:bg-orange-50 hover:text-alibaba-orange px-2.5 py-1 rounded-full cursor-pointer transition text-gray-600">electric bike</span>
-                    <span class="bg-gray-100 hover:bg-orange-50 hover:text-alibaba-orange px-2.5 py-1 rounded-full cursor-pointer transition text-gray-600">lithium battery</span>
-                    <span class="bg-gray-100 hover:bg-orange-50 hover:text-alibaba-orange px-2.5 py-1 rounded-full cursor-pointer transition text-gray-600">charging station</span>
-                    <span class="bg-gray-100 hover:bg-orange-50 hover:text-alibaba-orange px-2.5 py-1 rounded-full cursor-pointer transition text-gray-600">ev parts</span>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Product Main Image (Select File)</label>
+                    <input type="file" id="pImageFile" accept="image/*" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-orange-50 file:text-alibaba-orange hover:file:bg-orange-100 cursor-pointer border rounded-lg p-1.5">
                 </div>
-            </div>
 
-            <div class="rounded-lg overflow-hidden shadow-sm bg-gradient-to-br from-gray-900 to-blue-950 text-white p-4 space-y-3">
-                <div class="text-xs font-bold text-orange-400 uppercase tracking-wider">Sustainable Mobility</div>
-                <div class="text-sm font-bold leading-snug">Quality electric vehicles and components from trusted suppliers worldwide.</div>
-                <button class="bg-alibaba-orange hover:bg-alibaba-darkOrange text-white text-xs font-semibold px-4 py-2 rounded-full transition w-full">
-                    Learn More <i class="fa-solid fa-arrow-right ml-1"></i>
+                <div class="flex flex-wrap gap-6 pt-2">
+                    <label class="flex items-center gap-2 text-xs font-semibold cursor-pointer"><input type="checkbox" id="pFeatured" class="w-4 h-4 text-alibaba-orange rounded"> Featured</label>
+                    <label class="flex items-center gap-2 text-xs font-semibold cursor-pointer"><input type="checkbox" id="pHot" checked class="w-4 h-4 text-alibaba-orange rounded"> Hot</label>
+                    <label class="flex items-center gap-2 text-xs font-semibold cursor-pointer"><input type="checkbox" id="pBestPrice" class="w-4 h-4 text-alibaba-orange rounded"> Best Price</label>
+                    <label class="flex items-center gap-2 text-xs font-semibold cursor-pointer"><input type="checkbox" id="pTopSeller" class="w-4 h-4 text-alibaba-orange rounded"> Top Seller</label>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Description</label>
+                    <textarea id="pDescription" rows="3" placeholder="Write detailed product description..." class="w-full text-sm border rounded-lg p-2.5"></textarea>
+                </div>
+
+                <button type="submit" id="submitBtn" class="w-full bg-alibaba-orange hover:bg-alibaba-darkOrange text-white font-bold py-3 rounded-lg shadow transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Post Product to Database & Public Site
                 </button>
-            </div>
-        </aside>
-    </main>
+            </form>
+        </div>
+    </div>
 
-    <footer class="bg-white border-t border-gray-200 mt-10 py-6 text-center text-xs text-gray-500">
-        <p>&copy; 2026 Alibaba.com. All rights reserved. Global B2B Sourcing Platform.</p>
-    </footer>
-
+    <!-- Application JavaScript with Direct Supabase Connection -->
     <script>
-        // ====================== YOUR SUPABASE ======================
+        // Pre-configured Supabase Connection
         const SUPABASE_URL = 'https://zgbdhpebmjokbaeflqhj.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_m5osddO3GFnJlQYIvSHS3Q_WqF72WwV';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_m5osddO3GFnJlQYIvSHS3Q_WqF72WwV';
 
-        // ====================== STATE ======================
-        let products = [];
-        let suppliers = [];
-        let categories = [];
+        let supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
-        // ====================== HELPERS ======================
-        function formatPrice(min, max) {
-            if (min && max) return `$${Number(min).toLocaleString()} - $${Number(max).toLocaleString()}`;
-            if (min) return `From $${Number(min).toLocaleString()}`;
-            return 'Price on request';
-        }
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPublicData();
+            loadAdminData();
+        });
 
-        function getBadge(p) {
-            if (p.is_top_seller) return { text: 'Top Seller', color: 'bg-orange-500' };
-            if (p.is_hot) return { text: 'Hot', color: 'bg-red-500' };
-            if (p.is_best_price) return { text: 'Best Price', color: 'bg-green-500' };
-            if (p.is_featured) return { text: 'Featured', color: 'bg-blue-500' };
-            return { text: 'New', color: 'bg-gray-500' };
-        }
-
-        // ====================== RENDER ======================
-        function renderCategories() {
-            const sidebar = document.getElementById('sidebarCategories');
-            const sidebarEmpty = document.getElementById('sidebarEmpty');
-            const grid = document.getElementById('categoryGrid');
-            const empty = document.getElementById('categoryEmptyState');
-
-            if (categories.length === 0) {
-                sidebar.innerHTML = '';
-                sidebarEmpty.style.display = 'block';
-                grid.innerHTML = '';
-                empty.style.display = 'block';
-                return;
+        function switchView(view) {
+            if (view === 'public') {
+                document.getElementById('publicView').style.display = 'block';
+                document.getElementById('adminView').style.display = 'none';
+                document.getElementById('btnPublic').className = 'bg-alibaba-orange px-3 py-1 rounded font-semibold transition';
+                document.getElementById('btnAdmin').className = 'bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded font-semibold transition';
+                loadPublicData();
+            } else {
+                document.getElementById('publicView').style.display = 'none';
+                document.getElementById('adminView').style.display = 'block';
+                document.getElementById('btnAdmin').className = 'bg-alibaba-orange px-3 py-1 rounded font-semibold transition';
+                document.getElementById('btnPublic').className = 'bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded font-semibold transition';
+                loadAdminData();
             }
-
-            sidebarEmpty.style.display = 'none';
-            empty.style.display = 'none';
-
-            const iconMap = {
-                'Electric Bikes': 'fa-bicycle',
-                'Electric Motorcycles': 'fa-motorcycle',
-                'Electric Cars': 'fa-car',
-                'Electric Scooters': 'fa-bolt',
-                'Electric Commercial Vehicles': 'fa-truck-fast',
-                'Batteries & Charging': 'fa-battery-full',
-                'EV Components': 'fa-gears',
-                'OEM & Manufacturing': 'fa-industry'
-            };
-
-            sidebar.innerHTML = categories.map(cat => `
-                <li>
-                    <a href="#" class="flex items-center justify-between p-2 hover:bg-orange-50 hover:text-alibaba-orange rounded transition">
-                        <div class="flex items-center gap-2.5">
-                            <i class="fa-solid ${iconMap[cat.name] || 'fa-box'} w-4 text-gray-400"></i>
-                            ${cat.name}
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
-                    </a>
-                </li>
-            `).join('');
-
-            grid.innerHTML = categories.slice(0, 6).map(cat => `
-                <div class="bg-gray-50 border border-gray-100 rounded-lg p-2.5 text-center hover:shadow-md transition cursor-pointer">
-                    <div class="w-full h-20 bg-white rounded flex items-center justify-center mb-2">
-                        <i class="fa-solid ${iconMap[cat.name] || 'fa-box'} text-3xl text-gray-300"></i>
-                    </div>
-                    <div class="text-xs font-bold text-gray-800">${cat.name}</div>
-                    <div class="text-[10px] text-alibaba-orange font-semibold mt-0.5">Shop now →</div>
-                </div>
-            `).join('');
         }
 
-        function renderProducts() {
-            const grid = document.getElementById('featuredProductsGrid');
-            const empty = document.getElementById('productsEmptyState');
+        // Load Public Storefront Data (Only displays products where status = 'published')
+        async function loadPublicData() {
+            try {
+                // 1. Fetch categories
+                const { data: cats } = await supabaseClient.from('categories').select('*').eq('is_active', true);
+                const catList = document.getElementById('publicCategoriesList');
+                if (cats && cats.length > 0) {
+                    catList.innerHTML = cats.map(c => `
+                        <li><a href="#" class="flex items-center justify-between p-2 hover:bg-orange-50 hover:text-alibaba-orange rounded transition">
+                            <div class="flex items-center gap-2.5"><i class="fa-solid fa-circle-dot w-4 text-gray-400 text-[8px]"></i> ${c.name}</div>
+                            <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                        </a></li>
+                    `).join('');
+                }
 
-            if (products.length === 0) {
-                grid.innerHTML = '';
-                empty.style.display = 'block';
-                return;
-            }
+                // 2. Fetch ONLY published products
+                const { data: prods, error } = await supabaseClient
+                    .from('products')
+                    .select('*, suppliers(company_name, country, years_in_business)')
+                    .eq('status', 'published')
+                    .order('created_at', { ascending: false });
 
-            empty.style.display = 'none';
+                const grid = document.getElementById('publicProductsGrid');
+                const emptyState = document.getElementById('publicEmptyState');
 
-            grid.innerHTML = products.map(p => {
-                const badge = getBadge(p);
-                return `
-                    <div class="bg-white border border-gray-200 rounded-lg p-3 flex flex-col justify-between hover:shadow-md transition">
-                        <div>
-                            <div class="relative mb-2">
-                                <span class="absolute top-1 left-1 ${badge.color} text-white text-[9px] font-bold px-1.5 py-0.5 rounded z-10">${badge.text}</span>
-                                <img src="${p.main_image_url || 'https://via.placeholder.com/300x200?text=No+Image'}" 
-                                     alt="${p.title}" 
-                                     class="w-full h-36 object-contain rounded bg-gray-50">
+                if (prods && prods.length > 0) {
+                    emptyState.style.display = 'none';
+                    grid.innerHTML = prods.map(p => `
+                        <div class="bg-white border border-gray-200 rounded-lg p-3 flex flex-col justify-between hover:shadow-md transition">
+                            <div>
+                                <div class="relative mb-2">
+                                    <span class="absolute top-1 left-1 bg-orange-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">${p.is_hot ? 'Hot' : (p.is_featured ? 'Featured' : 'Verified')}</span>
+                                    <img src="${p.main_image_url || 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=500&q=80'}" alt="${p.title}" class="w-full h-40 object-contain rounded bg-gray-50">
+                                </div>
+                                <h3 class="text-xs font-bold text-gray-800 line-clamp-2 mb-1">${p.title}</h3>
+                                <div class="text-sm font-black text-gray-900">$${p.price_min} - $${p.price_max}</div>
+                                <div class="text-[10px] text-gray-500">MOQ: ${p.moq} unit(s)</div>
                             </div>
-                            <h3 class="text-xs font-bold text-gray-800 line-clamp-2 mb-1">${p.title}</h3>
-                            <div class="text-sm font-black text-gray-900">${formatPrice(p.price_min, p.price_max)}</div>
-                            <div class="text-[10px] text-gray-500">MOQ: ${p.moq || 1} units</div>
-                        </div>
-                        <div class="mt-3 pt-2 border-t border-gray-100 flex items-center justify-between gap-2">
-                            <span class="text-[10px] text-gray-600 flex items-center gap-1">
-                                <img src="https://flagcdn.com/w20/cn.png" class="w-3.5"> ${p.country || 'China'}
-                            </span>
-                            <div class="flex gap-1">
-                                <button class="bg-orange-50 text-alibaba-orange hover:bg-alibaba-orange hover:text-white px-2 py-1 rounded text-[10px] font-semibold transition">Contact</button>
-                                <button class="bg-gray-100 text-gray-700 hover:bg-gray-200 px-2 py-1 rounded text-[10px] font-semibold transition">Quote</button>
+                            <div class="mt-3 pt-2 border-t border-gray-100 flex items-center justify-between">
+                                <span class="text-[10px] text-gray-600">${p.suppliers?.company_name || 'Verified Supplier'}</span>
+                                <button class="bg-orange-50 text-alibaba-orange hover:bg-alibaba-orange hover:text-white px-2.5 py-1 rounded text-[10px] font-semibold transition">Contact</button>
                             </div>
                         </div>
-                    </div>
-                `;
-            }).join('');
+                    `).join('');
+                } else {
+                    grid.innerHTML = '';
+                    emptyState.style.display = 'block';
+                }
+            } catch (err) {
+                console.error("Error loading public data:", err);
+            }
         }
 
-        function renderSuppliers() {
-            const grid = document.getElementById('verifiedSuppliersGrid');
-            const empty = document.getElementById('suppliersEmptyState');
+        // Load Admin Data
+        async function loadAdminData() {
+            try {
+                const { data: sups } = await supabaseClient.from('suppliers').select('*');
+                const supSelect = document.getElementById('adminSupplierId');
+                if (sups && sups.length > 0) {
+                    supSelect.innerHTML = sups.map(s => `<option value="${s.id}">${s.company_name} (${s.country || 'Global'})</option>`).join('');
+                } else {
+                    supSelect.innerHTML = '<option value="">No suppliers found. Create one below &rarr;</option>';
+                }
 
-            if (suppliers.length === 0) {
-                grid.innerHTML = '';
-                empty.style.display = 'block';
+                const { data: cats } = await supabaseClient.from('categories').select('*');
+                const catSelect = document.getElementById('pCategoryId');
+                if (cats && cats.length > 0) {
+                    catSelect.innerHTML = '<option value="">-- Select Category --</option>' + cats.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                }
+            } catch (err) {
+                console.error("Error loading admin dropdowns:", err);
+            }
+        }
+
+        function toggleNewSupplierForm() {
+            document.getElementById('newSupplierForm').classList.toggle('hidden');
+        }
+
+        async function createSupplierInDB() {
+            const name = document.getElementById('supCompanyName').value.trim();
+            const country = document.getElementById('supCountry').value.trim();
+            if (!name) { alert('Please enter company name.'); return; }
+
+            try {
+                const { data, error } = await supabaseClient.from('suppliers').insert([{
+                    company_name: name,
+                    country: country,
+                    years_in_business: 5,
+                    is_verified: true,
+                    is_gold: true,
+                    main_products: ['Electric Vehicles', 'Batteries']
+                }]).select();
+
+                if (error) throw error;
+                alert('Supplier created successfully!');
+                document.getElementById('supCompanyName').value = '';
+                document.getElementById('newSupplierForm').classList.add('hidden');
+                loadAdminData();
+            } catch (err) {
+                console.error(err);
+                alert('Error creating supplier: ' + err.message);
+            }
+        }
+
+        // Handle Product Submission & Storage Upload
+        async function handleProductSubmit(e) {
+            e.preventDefault();
+            const supplierId = document.getElementById('adminSupplierId').value;
+            if (!supplierId) {
+                alert('Please select or create a Supplier first.');
                 return;
             }
 
-            empty.style.display = 'none';
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Uploading & Saving...';
 
-            grid.innerHTML = suppliers.map(s => `
-                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="font-bold text-xs text-gray-900 truncate">${s.company_name}</span>
-                            <span class="text-[10px] text-gray-500 whitespace-nowrap">${s.country || 'China'} • ${s.years_in_business || 0} yrs</span>
-                        </div>
-                        <div class="flex gap-1 mb-2 flex-wrap">
-                            ${s.is_verified ? '<span class="bg-blue-100 text-blue-800 text-[9px] px-1.5 py-0.5 rounded font-semibold">Verified</span>' : ''}
-                            ${s.is_gold || s.badge === 'gold' ? '<span class="bg-orange-100 text-orange-800 text-[9px] px-1.5 py-0.5 rounded font-semibold">Gold Supplier</span>' : ''}
-                        </div>
-                        <div class="text-[11px] text-gray-600 line-clamp-2">
-                            Main Products: ${(s.main_products || []).join(', ') || 'Electric Vehicles & Components'}
-                        </div>
-                    </div>
-                    <div class="mt-3 pt-2 border-t border-gray-200 flex justify-between">
-                        <button class="text-[10px] font-semibold text-alibaba-orange hover:underline">View Supplier</button>
-                        <button class="text-[10px] font-semibold bg-alibaba-orange text-white px-3 py-1 rounded">Contact</button>
-                    </div>
-                </div>
-            `).join('');
+            try {
+                let imageUrl = 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=500&q=80';
+                const fileInput = document.getElementById('pImageFile');
+
+                if (fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    const fileName = `${Date.now()}_${file.name}`;
+                    
+                    const { error: uploadError } = await supabaseClient.storage
+                        .from('product-images')
+                        .upload(fileName, file);
+
+                    if (uploadError) throw uploadError;
+
+                    const { data: publicUrlData } = supabaseClient.storage
+                        .from('product-images')
+                        .getPublicUrl(fileName);
+
+                    imageUrl = publicUrlData.publicUrl;
+                }
+
+                const productData = {
+                    supplier_id: supplierId,
+                    category_id: document.getElementById('pCategoryId').value || null,
+                    title: document.getElementById('pTitle').value,
+                    slug: document.getElementById('pTitle').value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+                    description: document.getElementById('pDescription').value,
+                    price_min: parseFloat(document.getElementById('pMinPrice').value),
+                    price_max: parseFloat(document.getElementById('pMaxPrice').value),
+                    moq: parseInt(document.getElementById('pMoq').value) || 1,
+                    main_image_url: imageUrl,
+                    images: [imageUrl],
+                    status: document.getElementById('pStatus').value,
+                    is_featured: document.getElementById('pFeatured').checked,
+                    is_hot: document.getElementById('pHot').checked,
+                    is_best_price: document.getElementById('pBestPrice').checked,
+                    is_top_seller: document.getElementById('pTopSeller').checked,
+                    country: document.getElementById('pCountry').value
+                };
+
+                const { error: insertError } = await supabaseClient.from('products').insert([productData]);
+                if (insertError) throw insertError;
+
+                alert('Success! Product posted. It is now live on the public storefront.');
+                document.getElementById('productForm').reset();
+                switchView('public');
+
+            } catch (err) {
+                console.error(err);
+                alert('Error posting product: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Post Product to Database & Public Site';
+            }
         }
-
-        // ====================== FETCH ======================
-        async function loadCategories() {
-            const { data, error } = await supabase
-                .from('categories')
-                .select('*')
-                .eq('is_active', true)
-                .order('sort_order', { ascending: true });
-
-            if (error) console.error(error);
-            categories = data || [];
-            renderCategories();
-        }
-
-        async function loadProducts() {
-            const { data, error } = await supabase
-                .from('products')
-                .select('*')
-                .eq('status', 'published')
-                .order('is_featured', { ascending: false })
-                .order('published_at', { ascending: false })
-                .limit(12);
-
-            if (error) console.error(error);
-            products = data || [];
-            renderProducts();
-        }
-
-        async function loadSuppliers() {
-            const { data, error } = await supabase
-                .from('suppliers')
-                .select('*')
-                .eq('is_active', true)
-                .eq('is_verified', true)
-                .order('is_gold', { ascending: false })
-                .limit(8);
-
-            if (error) console.error(error);
-            suppliers = data || [];
-            renderSuppliers();
-        }
-
-        // ====================== REALTIME ======================
-        function setupRealtime() {
-            supabase.channel('public:products')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => loadProducts())
-                .subscribe();
-
-            supabase.channel('public:categories')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'categories' }, () => loadCategories())
-                .subscribe();
-
-            supabase.channel('public:suppliers')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'suppliers' }, () => loadSuppliers())
-                .subscribe();
-        }
-
-        // ====================== INIT ======================
-        async function init() {
-            await Promise.all([loadCategories(), loadProducts(), loadSuppliers()]);
-            setupRealtime();
-        }
-
-        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
