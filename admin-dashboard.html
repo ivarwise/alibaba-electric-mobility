@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard – EVSource Admin</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              orange: '#FF6A00',
+              dark: '#E55A00',
+              navy: '#0F172A'
+            }
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .sidebar-link.active { background: rgba(255, 106, 0, 0.12); color: #FF6A00; }
+    .skeleton {
+      background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+  </style>
+</head>
+
+<body class="bg-slate-100 text-slate-800 antialiased">
+
+  <div class="flex min-h-screen">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 text-white transform -translate-x-full lg:translate-x-0 transition-transform duration-200">
+      <div class="flex flex-col h-full">
+        <div class="px-6 py-5 border-b border-slate-800">
+          <a href="admin-dashboard.html" class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-brand-orange flex items-center justify-center text-white font-black text-sm">EV</div>
+            <div>
+              <p class="font-bold text-white leading-none">EVSource</p>
+              <p class="text-[10px] text-slate-500">Admin Panel</p>
+            </div>
+          </a>
+        </div>
+
+        <nav class="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
+          <p class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Main</p>
+          <a href="admin-dashboard.html" class="sidebar-link active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition">
+            <i class="fa-solid fa-chart-pie w-5 text-center"></i> Dashboard
+          </a>
+          <a href="admin-products.html" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa-solid fa-box w-5 text-center"></i> Products
+          </a>
+          <a href="admin-suppliers.html" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa-solid fa-building w-5 text-center"></i> Suppliers
+          </a>
+          <a href="admin-orders.html" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa-solid fa-cart-shopping w-5 text-center"></i> Orders
+          </a>
+          <a href="admin-quotations.html" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa-solid fa-file-invoice w-5 text-center"></i> Quotations
+          </a>
+          <a href="admin-categories.html" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa-solid fa-tags w-5 text-center"></i> Categories
+          </a>
+        </nav>
+
+        <div class="px-4 py-4 border-t border-slate-800">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-brand-orange flex items-center justify-center text-sm font-bold" id="admin-avatar">A</div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold truncate" id="admin-name">Admin</p>
+              <p class="text-xs text-slate-500 truncate" id="admin-email">—</p>
+            </div>
+            <button id="logout-btn" class="text-slate-500 hover:text-red-400 transition">
+              <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="flex-1 lg:ml-64">
+
+      <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+        <div class="flex items-center justify-between px-4 sm:px-6 h-14">
+          <div class="flex items-center gap-3">
+            <button id="sidebar-toggle" class="lg:hidden text-slate-600 text-xl">
+              <i class="fa-solid fa-bars"></i>
+            </button>
+            <h1 class="text-base font-bold text-slate-900">Dashboard</h1>
+          </div>
+          <a href="admin-product-create.html"
+             class="bg-brand-orange hover:bg-brand-dark text-white text-sm font-bold px-4 py-2 rounded-lg transition flex items-center gap-2">
+            <i class="fa-solid fa-plus text-xs"></i>
+            <span class="hidden sm:inline">Add Product</span>
+          </a>
+        </div>
+      </header>
+
+      <main class="p-4 sm:p-6 lg:p-8">
+
+        <!-- Welcome -->
+        <div class="mb-6">
+          <h2 class="text-xl font-black text-slate-900">Welcome back</h2>
+          <p class="text-sm text-slate-500 mt-0.5">Here’s what’s happening on EVSource today</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+          <div class="bg-white rounded-xl border border-slate-100 p-4 sm:p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <div class="w-10 h-10 rounded-lg bg-orange-50 text-brand-orange flex items-center justify-center">
+                <i class="fa-solid fa-box"></i>
+              </div>
+            </div>
+            <p class="text-2xl font-black text-slate-900" id="stat-products">—</p>
+            <p class="text-xs text-slate-500 mt-0.5">Total Products</p>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-100 p-4 sm:p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <i class="fa-solid fa-check-circle"></i>
+              </div>
+            </div>
+            <p class="text-2xl font-black text-slate-900" id="stat-published">—</p>
+            <p class="text-xs text-slate-500 mt-0.5">Published</p>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-100 p-4 sm:p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                <i class="fa-solid fa-building"></i>
+              </div>
+            </div>
+            <p class="text-2xl font-black text-slate-900" id="stat-suppliers">—</p>
+            <p class="text-xs text-slate-500 mt-0.5">Suppliers</p>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-100 p-4 sm:p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <div class="w-10 h-10 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center">
+                <i class="fa-solid fa-file-invoice"></i>
+              </div>
+            </div>
+            <p class="text-2xl font-black text-slate-900" id="stat-quotations">—</p>
+            <p class="text-xs text-slate-500 mt-0.5">Quotations</p>
+          </div>
+        </div>
+
+        <!-- Second row stats -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+          <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm">
+            <p class="text-lg font-black text-slate-900" id="stat-orders">—</p>
+            <p class="text-xs text-slate-500">Orders</p>
+          </div>
+          <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm">
+            <p class="text-lg font-black text-amber-600" id="stat-draft">—</p>
+            <p class="text-xs text-slate-500">Draft Products</p>
+          </div>
+          <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm">
+            <p class="text-lg font-black text-blue-600" id="stat-pending">—</p>
+            <p class="text-xs text-slate-500">Pending Review</p>
+          </div>
+          <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm">
+            <p class="text-lg font-black text-slate-900" id="stat-categories">—</p>
+            <p class="text-xs text-slate-500">Categories</p>
+          </div>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-5">
+
+          <!-- Recent Products -->
+          <div class="lg:col-span-2 bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+              <h3 class="font-bold text-slate-900">Recent Products</h3>
+              <a href="admin-products.html" class="text-xs font-semibold text-brand-orange hover:underline">View all →</a>
+            </div>
+            <div id="recent-products" class="divide-y divide-slate-50">
+              <div class="p-4 space-y-3">
+                <div class="h-12 skeleton rounded-lg"></div>
+                <div class="h-12 skeleton rounded-lg"></div>
+                <div class="h-12 skeleton rounded-lg"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions + Status -->
+          <div class="space-y-5">
+            <div class="bg-white rounded-xl border border-slate-100 shadow-sm p-5">
+              <h3 class="font-bold text-slate-900 mb-4">Quick Actions</h3>
+              <div class="space-y-2">
+                <a href="admin-product-create.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-orange-50 text-brand-orange font-semibold text-sm hover:bg-orange-100 transition">
+                  <i class="fa-solid fa-plus w-5 text-center"></i> Add Product
+                </a>
+                <a href="admin-products.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-50 text-sm font-medium text-slate-700 transition">
+                  <i class="fa-solid fa-box w-5 text-center text-slate-400"></i> Manage Products
+                </a>
+                <a href="admin-suppliers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-50 text-sm font-medium text-slate-700 transition">
+                  <i class="fa-solid fa-building w-5 text-center text-slate-400"></i> Suppliers
+                </a>
+                <a href="admin-categories.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-50 text-sm font-medium text-slate-700 transition">
+                  <i class="fa-solid fa-tags w-5 text-center text-slate-400"></i> Categories
+                </a>
+                <a href="index.html" target="_blank" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-50 text-sm font-medium text-slate-700 transition">
+                  <i class="fa-solid fa-store w-5 text-center text-slate-400"></i> View Storefront
+                </a>
+              </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl p-5 text-white">
+              <p class="text-xs font-bold text-brand-orange uppercase tracking-wider mb-1">Store Status</p>
+              <p class="text-sm font-semibold mb-3">Your marketplace is live</p>
+              <div class="flex items-center gap-2 text-xs text-slate-300">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                Products appear when status = Published
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden"></div>
+
+  <script>
+    const SUPABASE_URL = "https://zgbdhpebmjokbaeflqhj.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_m5osddO3GFnJlQYIvSHS3Q_WqF72WwV";
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Sidebar
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    document.getElementById('sidebar-toggle')?.addEventListener('click', () => {
+      sidebar.classList.toggle('-translate-x-full');
+      overlay.classList.toggle('hidden');
+    });
+    overlay?.addEventListener('click', () => {
+      sidebar.classList.add('-translate-x-full');
+      overlay.classList.add('hidden');
+    });
+
+    function formatPrice(min, max, currency = 'USD') {
+      if (min == null && max == null) return '—';
+      const s = currency === 'USD' ? '$' : currency + ' ';
+      if (min != null && max != null && min !== max) return `${s}${Number(min).toLocaleString()} – ${s}${Number(max).toLocaleString()}`;
+      return `${s}${Number(min || max).toLocaleString()}`;
+    }
+
+    function statusBadge(status) {
+      const map = {
+        published: 'bg-emerald-100 text-emerald-700',
+        draft: 'bg-slate-100 text-slate-600',
+        pending: 'bg-amber-100 text-amber-700',
+        rejected: 'bg-red-100 text-red-700',
+        archived: 'bg-slate-100 text-slate-500'
+      };
+      return `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${map[status] || 'bg-slate-100 text-slate-600'}">${status}</span>`;
+    }
+
+    async function loadDashboard() {
+      try {
+        // Products
+        const { data: products } = await supabaseClient
+          .from('products')
+          .select('id, title, price_min, price_max, currency, main_image_url, images, status, created_at, suppliers(company_name)')
+          .order('created_at', { ascending: false });
+
+        const all = products || [];
+        document.getElementById('stat-products').textContent = all.length;
+        document.getElementById('stat-published').textContent = all.filter(p => p.status === 'published').length;
+        document.getElementById('stat-draft').textContent = all.filter(p => p.status === 'draft').length;
+        document.getElementById('stat-pending').textContent = all.filter(p => p.status === 'pending').length;
+
+        // Recent products
+        const recent = all.slice(0, 6);
+        const el = document.getElementById('recent-products');
+        if (recent.length === 0) {
+          el.innerHTML = `<div class="py-10 text-center text-sm text-slate-400">No products yet. <a href="admin-product-create.html" class="text-brand-orange font-semibold">Add one →</a></div>`;
+        } else {
+          el.innerHTML = recent.map(p => {
+            const img = p.main_image_url || (p.images && p.images[0]) || 'https://placehold.co/64x64?text=No';
+            return `
+              <a href="admin-products.html" class="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition">
+                <img src="${img}" class="w-11 h-11 rounded-lg object-cover bg-slate-100 flex-shrink-0" onerror="this.src='https://placehold.co/64x64?text=No'">
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold text-slate-900 truncate">${p.title}</p>
+                  <p class="text-[11px] text-slate-400">${p.suppliers?.company_name || '—'} · ${formatPrice(p.price_min, p.price_max, p.currency)}</p>
+                </div>
+                ${statusBadge(p.status)}
+              </a>`;
+          }).join('');
+        }
+
+        // Suppliers
+        const { count: suppliersCount } = await supabaseClient
+          .from('suppliers')
+          .select('*', { count: 'exact', head: true })
+          .eq('is_active', true);
+        document.getElementById('stat-suppliers').textContent = suppliersCount ?? 0;
+
+        // Categories
+        const { count: categoriesCount } = await supabaseClient
+          .from('categories')
+          .select('*', { count: 'exact', head: true })
+          .eq('is_active', true);
+        document.getElementById('stat-categories').textContent = categoriesCount ?? 0;
+
+        // Orders
+        const { count: ordersCount } = await supabaseClient
+          .from('orders')
+          .select('*', { count: 'exact', head: true });
+        document.getElementById('stat-orders').textContent = ordersCount ?? 0;
+
+        // Quotations
+        const { count: quotationsCount } = await supabaseClient
+          .from('quotations')
+          .select('*', { count: 'exact', head: true });
+        document.getElementById('stat-quotations').textContent = quotationsCount ?? 0;
+
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function checkAuth() {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabaseClient.from('profiles').select('full_name').eq('id', user.id).single();
+        const name = profile?.full_name || user.email?.split('@')[0] || 'Admin';
+        document.getElementById('admin-name').textContent = name;
+        document.getElementById('admin-email').textContent = user.email || '';
+        document.getElementById('admin-avatar').textContent = name.charAt(0).toUpperCase();
+      }
+    }
+
+    document.getElementById('logout-btn')?.addEventListener('click', async () => {
+      if (!confirm('Logout?')) return;
+      await supabaseClient.auth.signOut();
+      window.location.href = 'admin-login.html';
+    });
+
+    checkAuth();
+    loadDashboard();
+  </script>
+</body>
+</html>
