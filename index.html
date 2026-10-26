@@ -2,357 +2,325 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Alibaba – Global Trade Starts Here</title>
-  <meta name="description" content="Source electric vehicles, bikes, batteries and components from verified suppliers worldwide." />
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            ali: {
-              orange: '#FF6A00',
-              dark: '#E55A00',
-              navy: '#0F172A'
-            }
-          },
-          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
-        }
-      }
-    }
-  </script>
-
   <style>
-    body { font-family: 'Inter', system-ui, sans-serif; }
-    .scrollbar-hide::-webkit-scrollbar { display: none; }
-    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Inter', 'Plus Jakarta Sans', system-ui, sans-serif;
+      background: #F3F4F6;
+      color: #1F2937;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .text-ali-orange { color: #FF6600; }
+    .bg-ali-orange { background-color: #FF6600; }
+    .border-ali-orange { border-color: #FF6600; }
+    .hover-bg-ali-orange:hover { background-color: #E55B00; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     .skeleton {
       background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
       background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
+      animation: shimmer 1.4s infinite;
     }
     @keyframes shimmer {
       0% { background-position: 200% 0; }
       100% { background-position: -200% 0; }
     }
-    .drawer { transform: translateX(-100%); transition: transform 0.28s ease; }
-    .drawer.open { transform: translateX(0); }
-    .backdrop { opacity: 0; pointer-events: none; transition: opacity 0.28s; }
-    .backdrop.open { opacity: 1; pointer-events: auto; }
-    .bottom-nav { padding-bottom: env(safe-area-inset-bottom, 0); }
   </style>
 </head>
+<body class="min-h-screen text-xs pb-20 lg:pb-0">
 
-<body class="bg-[#f5f5f5] text-slate-800 antialiased pb-20 lg:pb-0">
+  <!-- ===================== DESKTOP HEADER ===================== -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-50 hidden lg:block">
+    <div class="max-w-[1530px] mx-auto px-4 h-16 flex items-center justify-between gap-4">
+      <a href="index.html" class="flex items-center gap-2 flex-shrink-0">
+        <span class="text-3xl font-black italic tracking-tighter text-ali-orange">EL</span>
+        <div class="leading-none">
+          <span class="text-xl font-bold tracking-tight text-ali-orange block">Alibaba</span>
+          <span class="text-[9px] text-gray-400 -mt-1 block">Global Trade Starts Here</span>
+        </div>
+      </a>
 
-  <!-- ========== TOP BAR (desktop) ========== -->
-  <div class="hidden lg:block bg-white border-b border-slate-100">
-    <div class="max-w-[1440px] mx-auto px-4 h-8 flex items-center justify-between text-[11px] text-slate-500">
-      <span class="flex items-center gap-1.5">
-        <span class="text-ali-orange font-bold">Alibaba.com</span>
-        <span>Global Trade Starts Here</span>
-      </span>
-      <div class="flex items-center gap-4">
-        <span class="flex items-center gap-1"><img src="https://flagcdn.com/w20/us.png" class="w-4 h-3 object-cover" alt=""> USD</span>
-        <span>English</span>
-        <a href="login.html" class="hover:text-ali-orange">Sign In</a>
-        <a href="register.html" class="hover:text-ali-orange">Join Free</a>
-      </div>
-    </div>
-  </div>
-
-  <!-- ========== MAIN HEADER ========== -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
-    <div class="max-w-[1440px] mx-auto px-3 sm:px-4">
-      <div class="flex items-center gap-2 sm:gap-4 h-14 sm:h-16">
-        <!-- Mobile menu -->
-        <button id="menu-btn" class="lg:hidden w-9 h-9 flex items-center justify-center text-slate-700">
-          <i class="fa-solid fa-bars text-lg"></i>
+      <div class="flex-1 max-w-3xl flex items-center">
+        <div class="relative w-full flex items-center">
+          <input id="desktop-search" type="search"
+            placeholder="Search for electric cars, bikes, motorcycles, batteries, suppliers..."
+            class="w-full pl-4 pr-12 py-2.5 text-xs text-gray-800 border-2 border-ali-orange rounded-l-md focus:outline-none" />
+          <button class="absolute right-2 text-gray-400"><i data-lucide="camera" class="w-4 h-4"></i></button>
+        </div>
+        <button id="desktop-search-btn" class="bg-ali-orange text-white px-7 py-2.5 font-semibold text-xs rounded-r-md hover:bg-orange-600 transition">
+          Search
         </button>
+      </div>
 
-        <!-- Logo -->
-        <a href="index.html" class="flex items-center gap-1.5 flex-shrink-0">
-          <svg class="w-7 h-7 sm:w-8 sm:h-8" viewBox="0 0 40 40" fill="none">
-            <path d="M8 12c0-2 1.5-4 4-4h4l4 8 4-8h4c2.5 0 4 2 4 4v16c0 2-1.5 4-4 4h-4l-4-8-4 8h-4c-2.5 0-4-2-4-4V12z" fill="#FF6A00"/>
-          </svg>
-          <div class="hidden sm:block">
-            <span class="font-black text-[#FF6A00] text-lg leading-none tracking-tight">Alibaba</span>
-            <p class="text-[9px] text-slate-400 leading-none">Global Trade Starts Here</p>
+      <div class="flex items-center gap-5 text-gray-700 font-medium">
+        <div class="flex items-center gap-1 cursor-pointer hover:text-ali-orange text-xs">
+          <span>🇺🇸</span><span>USD</span><i data-lucide="chevron-down" class="w-3 h-3 text-gray-400"></i>
+        </div>
+        <div class="flex items-center gap-1 cursor-pointer hover:text-ali-orange text-xs">
+          <span>English</span><i data-lucide="chevron-down" class="w-3 h-3 text-gray-400"></i>
+        </div>
+        <a href="messages.html" class="relative text-center hover:text-ali-orange">
+          <i data-lucide="message-square" class="w-5 h-5 mx-auto"></i>
+          <div class="text-[10px] text-gray-500 mt-0.5">Messages</div>
+        </a>
+        <a href="cart.html" class="relative text-center hover:text-ali-orange">
+          <i data-lucide="shopping-cart" class="w-5 h-5 mx-auto"></i>
+          <span id="cart-badge-d" class="absolute -top-1 right-0 min-w-[14px] h-3.5 bg-red-500 text-white text-[8px] font-bold rounded-full hidden items-center justify-center px-0.5">0</span>
+          <div class="text-[10px] text-gray-500 mt-0.5">Cart</div>
+        </a>
+        <a href="account.html" class="flex items-center gap-2 pl-2 border-l border-gray-200 hover:text-ali-orange">
+          <div class="w-8 h-8 rounded-full bg-ali-orange text-white flex items-center justify-center font-bold text-sm">A</div>
+          <div class="text-left">
+            <div class="font-bold text-xs text-gray-800 leading-tight">Buyer</div>
+            <div class="text-[10px] text-gray-400 leading-tight">Account</div>
           </div>
         </a>
-
-        <!-- Search -->
-        <div class="flex-1 max-w-2xl">
-          <div class="flex rounded-full lg:rounded-lg overflow-hidden border border-slate-200 lg:border-2 lg:border-ali-orange">
-            <input id="search-input" type="search"
-                   placeholder="Search for electric cars, bikes, motorcycles, batteries..."
-                   class="flex-1 bg-slate-50 lg:bg-white py-2 sm:py-2.5 px-3 sm:px-4 text-sm outline-none min-w-0">
-            <button id="search-btn" class="bg-ali-orange hover:bg-ali-dark text-white px-4 sm:px-5 transition flex-shrink-0">
-              <i class="fa-solid fa-magnifying-glass"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- Right icons -->
-        <div class="flex items-center gap-1 sm:gap-3 text-slate-600 flex-shrink-0">
-          <a href="messages.html" class="hidden md:flex flex-col items-center gap-0.5 hover:text-ali-orange transition text-[10px] relative px-1">
-            <i class="fa-regular fa-comment-dots text-lg"></i>
-            <span>Messages</span>
-          </a>
-          <a href="cart.html" class="flex flex-col items-center gap-0.5 hover:text-ali-orange transition text-[10px] relative px-1">
-            <i class="fa-solid fa-cart-shopping text-lg"></i>
-            <span class="hidden sm:inline">Cart</span>
-            <span id="cart-badge" class="absolute -top-1 right-0 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1 hidden">0</span>
-          </a>
-          <a href="account.html" class="hidden sm:flex flex-col items-center gap-0.5 hover:text-ali-orange transition text-[10px] px-1">
-            <i class="fa-regular fa-user text-lg"></i>
-            <span>Account</span>
-          </a>
-        </div>
       </div>
     </div>
 
-    <!-- Desktop secondary nav -->
-    <div class="hidden lg:block border-t border-slate-100">
-      <div class="max-w-[1440px] mx-auto px-4 flex items-center gap-6 h-10 text-sm">
-        <button id="all-cats-desktop" class="flex items-center gap-2 font-semibold text-slate-800 hover:text-ali-orange">
-          <i class="fa-solid fa-bars"></i> All Categories
-        </button>
-        <a href="shop.html" class="text-slate-600 hover:text-ali-orange">Sourcing Solutions</a>
-        <a href="suppliers.html" class="text-slate-600 hover:text-ali-orange">Verified Suppliers</a>
-        <a href="quotations.html" class="text-slate-600 hover:text-ali-orange">Request Quotation</a>
-        <a href="help.html" class="text-slate-600 hover:text-ali-orange">Help</a>
+    <div class="border-t border-gray-100 bg-white">
+      <div class="max-w-[1530px] mx-auto px-4 py-2 flex items-center gap-8 text-xs font-semibold text-gray-700">
+        <div class="flex items-center gap-2 text-gray-900 cursor-pointer hover:text-ali-orange">
+          <i data-lucide="menu" class="w-4 h-4"></i><span>All Categories</span>
+        </div>
+        <a href="shop.html" class="hover:text-ali-orange">Sourcing Solutions</a>
+        <a href="suppliers.html" class="hover:text-ali-orange">Verified Suppliers</a>
+        <a href="quotations.html" class="hover:text-ali-orange">Request Quotation</a>
+        <a href="help.html" class="hover:text-ali-orange">Help</a>
       </div>
     </div>
   </header>
 
-  <!-- MOBILE SIDE MENU -->
-  <div id="menu-backdrop" class="backdrop fixed inset-0 bg-black/40 z-[80]"></div>
-  <div id="menu-drawer" class="drawer fixed top-0 left-0 h-full w-[300px] max-w-[85vw] bg-white z-[90] shadow-2xl flex flex-col">
-    <div class="flex items-center justify-between px-4 py-3.5 border-b">
-      <div class="flex items-center gap-2">
-        <span class="font-black text-ali-orange text-lg">Alibaba</span>
-      </div>
-      <button id="close-menu" class="w-9 h-9 rounded-full hover:bg-slate-100 flex items-center justify-center">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </div>
-    <nav id="mobile-menu-cats" class="flex-1 overflow-y-auto py-2"></nav>
-  </div>
-
-  <!-- ========== MAIN LAYOUT ========== -->
-  <div class="max-w-[1440px] mx-auto px-3 sm:px-4 py-3 sm:py-5">
-    <div class="flex gap-5">
-
-      <!-- LEFT CATEGORIES (desktop) -->
-      <aside class="hidden lg:block w-56 flex-shrink-0">
-        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden sticky top-28">
-          <div class="px-4 py-3 border-b border-slate-100 font-bold text-sm flex items-center gap-2">
-            <i class="fa-solid fa-list text-ali-orange"></i> Categories
+  <!-- ===================== MOBILE HEADER ===================== -->
+  <div class="lg:hidden sticky top-0 z-50 bg-white border-b border-gray-100">
+    <header class="px-4 pt-2 pb-3">
+      <div class="flex items-center justify-between mb-3">
+        <a href="index.html" class="flex items-center gap-1">
+          <div class="w-8 h-8 rounded-full bg-ali-orange flex items-center justify-center text-white font-extrabold text-lg italic shadow-sm">e</div>
+          <div>
+            <span class="text-2xl font-black text-ali-orange tracking-tight leading-none block">Alibaba</span>
+            <span class="text-[9px] text-gray-400 font-medium block -mt-0.5">Global Trade Starts Here</span>
           </div>
-          <nav id="desktop-cats" class="py-1 max-h-[70vh] overflow-y-auto">
-            <div class="px-4 py-3"><div class="h-4 skeleton rounded w-3/4"></div></div>
-            <div class="px-4 py-3"><div class="h-4 skeleton rounded w-2/3"></div></div>
-          </nav>
-        </div>
-      </aside>
-
-      <!-- CENTER -->
-      <main class="flex-1 min-w-0 space-y-4 sm:space-y-5">
-
-        <!-- HERO -->
-        <section class="relative rounded-xl sm:rounded-2xl overflow-hidden bg-slate-900 h-[160px] sm:h-[220px] lg:h-[260px]">
-          <img src="https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=1400&q=80"
-               alt="Electric Mobility" class="absolute inset-0 w-full h-full object-cover opacity-60">
-          <div class="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-900/60 to-transparent"></div>
-          <div class="relative h-full flex flex-col justify-center px-4 sm:px-8 max-w-lg">
-            <p class="text-ali-orange text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1">Electric Mobility Solutions</p>
-            <h1 class="text-white text-lg sm:text-2xl lg:text-3xl font-black leading-tight mb-1.5">
-              Power the Future of<br><span class="text-ali-orange">Electric Mobility</span>
-            </h1>
-            <p class="text-slate-300 text-[11px] sm:text-sm mb-3 max-w-sm hidden sm:block">
-              Discover verified manufacturers, compare wholesale prices, and source electric vehicles globally.
-            </p>
-            <div class="flex gap-2">
-              <a href="shop.html" class="bg-ali-orange hover:bg-ali-dark text-white text-xs sm:text-sm font-bold px-3 sm:px-4 py-2 rounded-lg transition">
-                Explore Products →
-              </a>
-              <a href="suppliers.html" class="bg-white/15 hover:bg-white/25 text-white text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-lg transition backdrop-blur">
-                Find Suppliers
-              </a>
-            </div>
-          </div>
-        </section>
-
-        <!-- CATEGORY CARDS -->
-        <section>
-          <div id="category-cards" class="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
-            <div class="bg-white rounded-xl border border-slate-100 h-24 skeleton"></div>
-            <div class="bg-white rounded-xl border border-slate-100 h-24 skeleton"></div>
-            <div class="bg-white rounded-xl border border-slate-100 h-24 skeleton"></div>
-            <div class="bg-white rounded-xl border border-slate-100 h-24 skeleton hidden sm:block"></div>
-            <div class="bg-white rounded-xl border border-slate-100 h-24 skeleton hidden lg:block"></div>
-            <div class="bg-white rounded-xl border border-slate-100 h-24 skeleton hidden lg:block"></div>
-          </div>
-        </section>
-
-        <!-- FEATURED PRODUCTS -->
-        <section>
-          <div class="flex items-center justify-between mb-3">
-            <h2 class="font-bold text-slate-900 text-base">Featured Products</h2>
-            <a href="shop.html" class="text-sm text-ali-orange font-semibold hover:underline">View All →</a>
-          </div>
-          <div id="featured-products" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
-            <div class="bg-white rounded-xl border border-slate-100 h-80 skeleton"></div>
-            <div class="bg-white rounded-xl border border-slate-100 h-80 skeleton"></div>
-            <div class="bg-white rounded-xl border border-slate-100 h-80 skeleton hidden xl:block"></div>
-          </div>
-        </section>
-
-        <!-- VERIFIED SUPPLIERS -->
-        <section>
-          <div class="flex items-center justify-between mb-3">
-            <h2 class="font-bold text-slate-900 text-base">Verified Suppliers</h2>
-            <a href="suppliers.html" class="text-sm text-ali-orange font-semibold hover:underline">View All →</a>
-          </div>
-          <div id="suppliers-list" class="space-y-3">
-            <div class="bg-white rounded-xl border border-slate-100 h-24 skeleton"></div>
-            <div class="bg-white rounded-xl border border-slate-100 h-24 skeleton"></div>
-          </div>
-        </section>
-
-        <!-- BULK CTA -->
-        <section class="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-100 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-ali-orange/10 text-ali-orange flex items-center justify-center flex-shrink-0">
-              <i class="fa-solid fa-handshake"></i>
-            </div>
-            <div>
-              <p class="font-bold text-slate-900 text-sm">Bulk Orders & Custom Solutions</p>
-              <p class="text-xs text-slate-500">Get better prices for bulk orders and customized vehicles.</p>
-            </div>
-          </div>
-          <a href="quotations.html" class="bg-ali-orange hover:bg-ali-dark text-white text-sm font-bold px-4 py-2.5 rounded-lg transition whitespace-nowrap">
-            Request for Quotation →
+        </a>
+        <div class="flex items-center gap-2">
+          <button class="flex items-center gap-1 bg-gray-50 border border-gray-200 px-2.5 py-1 rounded-full text-xs font-semibold text-gray-700">
+            <span>🇺🇸</span><span>USD</span>
+          </button>
+          <a href="cart.html" class="relative p-1">
+            <i data-lucide="shopping-cart" class="w-5 h-5 text-gray-800"></i>
+            <span id="cart-badge-m" class="absolute -top-0.5 -right-0.5 min-w-[14px] h-3.5 bg-red-500 text-white text-[8px] font-bold rounded-full hidden items-center justify-center px-0.5">0</span>
           </a>
-        </section>
-      </main>
-
-      <!-- RIGHT SIDEBAR (desktop) -->
-      <aside class="hidden xl:block w-72 flex-shrink-0 space-y-4">
-        <div class="bg-white rounded-xl border border-slate-200 p-4">
-          <p class="text-sm font-semibold text-slate-900 mb-3">Welcome to Alibaba</p>
-          <div class="grid grid-cols-2 gap-2 text-center mb-3">
-            <div class="bg-slate-50 rounded-lg p-2.5">
-              <p class="text-lg font-black text-slate-900" id="stat-orders">0</p>
-              <p class="text-[10px] text-slate-500">Active Orders</p>
-            </div>
-            <div class="bg-slate-50 rounded-lg p-2.5">
-              <p class="text-lg font-black text-slate-900" id="stat-quotes">0</p>
-              <p class="text-[10px] text-slate-500">Pending Quotes</p>
-            </div>
-          </div>
-          <div class="flex gap-2">
-            <a href="login.html" class="flex-1 text-center text-xs font-semibold border border-slate-200 rounded-lg py-2 hover:bg-slate-50">Sign In</a>
-            <a href="register.html" class="flex-1 text-center text-xs font-semibold bg-ali-orange text-white rounded-lg py-2 hover:bg-ali-dark">Join Free</a>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-xl border border-slate-200 p-4">
-          <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Quick Access</p>
-          <div class="space-y-0.5 text-sm">
-            <a href="orders.html" class="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-slate-50"><i class="fa-solid fa-box text-slate-400 w-5"></i> My Orders</a>
-            <a href="quotations.html" class="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-slate-50"><i class="fa-solid fa-file-invoice text-slate-400 w-5"></i> My Quotations</a>
-            <a href="messages.html" class="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-slate-50"><i class="fa-solid fa-comments text-slate-400 w-5"></i> Messages</a>
-            <a href="favorites.html" class="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-slate-50"><i class="fa-solid fa-heart text-slate-400 w-5"></i> Favorites</a>
-            <a href="cart.html" class="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-slate-50"><i class="fa-solid fa-cart-shopping text-slate-400 w-5"></i> Cart</a>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-xl border border-slate-200 p-4">
-          <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Popular Searches</p>
-          <div id="popular-searches" class="flex flex-wrap gap-1.5">
-            <a href="shop.html?q=electric+bike" class="text-xs bg-slate-100 hover:bg-orange-50 hover:text-ali-orange text-slate-600 px-2.5 py-1 rounded-full transition">electric bike</a>
-            <a href="shop.html?q=lithium+battery" class="text-xs bg-slate-100 hover:bg-orange-50 hover:text-ali-orange text-slate-600 px-2.5 py-1 rounded-full transition">lithium battery</a>
-            <a href="shop.html?q=e-scooter" class="text-xs bg-slate-100 hover:bg-orange-50 hover:text-ali-orange text-slate-600 px-2.5 py-1 rounded-full transition">e-scooter</a>
-          </div>
-        </div>
-
-        <div class="rounded-xl overflow-hidden bg-gradient-to-br from-slate-900 to-slate-800 p-4 text-white">
-          <p class="text-[10px] font-bold text-ali-orange uppercase mb-1">Sustainable Mobility</p>
-          <p class="text-sm font-semibold leading-snug mb-2">Quality electric vehicles from trusted suppliers</p>
-          <a href="shop.html" class="inline-block text-xs font-bold bg-ali-orange hover:bg-ali-dark px-3 py-1.5 rounded-lg transition">Learn More →</a>
-        </div>
-      </aside>
-    </div>
-  </div>
-
-  <!-- FOOTER (desktop) -->
-  <footer class="hidden lg:block bg-slate-900 text-slate-400 mt-8">
-    <div class="max-w-[1440px] mx-auto px-4 py-10">
-      <div class="grid grid-cols-4 gap-8">
-        <div>
-          <span class="font-black text-ali-orange text-lg">Alibaba</span>
-          <p class="text-sm mt-2 leading-relaxed">Global B2B marketplace for electric mobility products and components.</p>
-        </div>
-        <div>
-          <h4 class="text-white font-bold text-xs uppercase tracking-wider mb-3">Buy</h4>
-          <ul class="space-y-2 text-sm">
-            <li><a href="shop.html" class="hover:text-white">All Products</a></li>
-            <li><a href="suppliers.html" class="hover:text-white">Suppliers</a></li>
-            <li><a href="quotations.html" class="hover:text-white">Request Quote</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="text-white font-bold text-xs uppercase tracking-wider mb-3">Sell</h4>
-          <ul class="space-y-2 text-sm">
-            <li><a href="register.html" class="hover:text-white">Become a Supplier</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="text-white font-bold text-xs uppercase tracking-wider mb-3">Support</h4>
-          <ul class="space-y-2 text-sm">
-            <li><a href="help.html" class="hover:text-white">Help Center</a></li>
-            <li><a href="contact.html" class="hover:text-white">Contact</a></li>
-          </ul>
         </div>
       </div>
+      <div class="relative flex items-center">
+        <div class="absolute left-3.5 text-gray-400"><i data-lucide="search" class="w-4 h-4"></i></div>
+        <input id="mobile-search" type="search" placeholder="Search for electric cars, bikes, motorcycles, batteries..."
+          class="w-full pl-10 pr-12 py-2.5 bg-gray-50 border border-gray-200 rounded-full text-xs text-gray-800 focus:outline-none focus:border-ali-orange placeholder-gray-400" />
+        <button id="mobile-search-btn" class="absolute right-1 bg-ali-orange text-white p-2 rounded-full hover:bg-orange-600 transition">
+          <i data-lucide="search" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+    </header>
+  </div>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="max-w-[1530px] mx-auto px-3 sm:px-4 py-3 sm:py-4 grid grid-cols-12 gap-4">
+
+    <!-- LEFT: Categories (desktop) -->
+    <aside class="hidden lg:block col-span-2 space-y-4">
+      <div class="bg-white rounded-lg p-3 shadow-sm border border-gray-200 sticky top-28">
+        <div class="flex items-center gap-2 font-bold text-sm text-gray-900 mb-3 pb-2 border-b border-gray-100">
+          <i data-lucide="list" class="w-4 h-4 text-ali-orange"></i>
+          <span>Categories</span>
+        </div>
+        <div id="desktop-cats" class="space-y-1">
+          <div class="h-10 skeleton rounded-md"></div>
+          <div class="h-10 skeleton rounded-md"></div>
+          <div class="h-10 skeleton rounded-md"></div>
+        </div>
+      </div>
+      <div class="relative rounded-lg overflow-hidden h-[280px] bg-gradient-to-b from-blue-900 to-slate-900 text-white p-4 flex flex-col justify-between">
+        <div class="relative z-10 space-y-2">
+          <h3 class="font-extrabold text-base leading-tight">Get the Best Electric Mobility Solutions</h3>
+          <ul class="text-[10px] space-y-1 text-gray-200">
+            <li class="flex items-center gap-1.5"><i data-lucide="check-circle" class="w-3 h-3 text-ali-orange"></i> Verified suppliers</li>
+            <li class="flex items-center gap-1.5"><i data-lucide="check-circle" class="w-3 h-3 text-ali-orange"></i> Competitive prices</li>
+            <li class="flex items-center gap-1.5"><i data-lucide="check-circle" class="w-3 h-3 text-ali-orange"></i> Global shipping</li>
+          </ul>
+        </div>
+        <a href="shop.html" class="relative z-10 bg-ali-orange text-white text-xs font-bold py-2 px-4 rounded-md text-center hover:bg-orange-600 transition">
+          Start Sourcing →
+        </a>
+      </div>
+    </aside>
+
+    <!-- CENTER -->
+    <div class="col-span-12 lg:col-span-8 space-y-4">
+
+      <!-- HERO -->
+      <div class="relative rounded-xl sm:rounded-2xl overflow-hidden bg-gradient-to-r from-gray-950 via-slate-900 to-blue-950 text-white p-5 sm:p-7 min-h-[180px] sm:min-h-[220px] shadow-lg flex flex-col justify-between">
+        <img src="https://images.unsplash.com/photo-1563720223185-11003d516935?w=1200&auto=format&fit=crop&q=80"
+             class="absolute right-0 top-0 h-full w-2/3 object-cover opacity-40 mix-blend-luminosity" alt="">
+        <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent"></div>
+        <div class="relative z-10 max-w-lg space-y-1 sm:space-y-2">
+          <p class="text-[10px] sm:text-xs font-semibold text-gray-300 tracking-wide uppercase">Electric Mobility Solutions</p>
+          <h1 class="text-xl sm:text-3xl font-black text-white leading-tight">
+            Power the Future of<br><span class="text-ali-orange">Electric Mobility</span>
+          </h1>
+          <p class="text-[10px] sm:text-[11px] text-gray-300 leading-normal max-w-md">
+            Discover verified manufacturers, compare wholesale prices, and source electric vehicles and components globally.
+          </p>
+          <div class="flex items-center gap-2 sm:gap-3 pt-2 sm:pt-3">
+            <a href="shop.html" class="bg-ali-orange hover:bg-orange-600 text-white font-bold px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full sm:rounded-md text-[11px] sm:text-xs flex items-center gap-1 transition">
+              Explore Products <i data-lucide="arrow-right" class="w-3 h-3"></i>
+            </a>
+            <a href="suppliers.html" class="bg-transparent border border-white/60 text-white font-semibold px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full sm:rounded-md text-[11px] sm:text-xs transition">
+              Find Suppliers
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- CATEGORY CARDS -->
+      <div id="category-cards" class="flex lg:grid lg:grid-cols-6 gap-2.5 overflow-x-auto no-scrollbar lg:overflow-visible -mx-1 px-1 py-1">
+        <div class="flex-shrink-0 w-24 lg:w-auto h-24 skeleton rounded-xl"></div>
+        <div class="flex-shrink-0 w-24 lg:w-auto h-24 skeleton rounded-xl"></div>
+        <div class="flex-shrink-0 w-24 lg:w-auto h-24 skeleton rounded-xl"></div>
+        <div class="flex-shrink-0 w-24 lg:w-auto h-24 skeleton rounded-xl hidden sm:block"></div>
+        <div class="flex-shrink-0 w-24 lg:w-auto h-24 skeleton rounded-xl hidden lg:block"></div>
+        <div class="flex-shrink-0 w-24 lg:w-auto h-24 skeleton rounded-xl hidden lg:block"></div>
+      </div>
+
+      <!-- FEATURED PRODUCTS -->
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-base font-extrabold text-gray-900">Featured Products</h2>
+          <a href="shop.html" class="text-xs font-bold text-ali-orange flex items-center gap-0.5">View All <i data-lucide="arrow-right" class="w-3 h-3"></i></a>
+        </div>
+
+        <!-- Mobile: horizontal scroll | Desktop: grid -->
+        <div id="featured-products"
+             class="flex lg:grid lg:grid-cols-3 gap-3 overflow-x-auto no-scrollbar lg:overflow-visible -mx-1 px-1 py-1">
+          <div class="flex-shrink-0 w-52 lg:w-auto h-72 skeleton rounded-2xl"></div>
+          <div class="flex-shrink-0 w-52 lg:w-auto h-72 skeleton rounded-2xl"></div>
+          <div class="flex-shrink-0 w-52 lg:w-auto h-72 skeleton rounded-2xl hidden lg:block"></div>
+        </div>
+      </div>
+
+      <!-- VERIFIED SUPPLIERS -->
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-base font-extrabold text-gray-900">Verified Suppliers</h2>
+          <a href="suppliers.html" class="text-xs font-bold text-ali-orange flex items-center gap-0.5">View All <i data-lucide="arrow-right" class="w-3 h-3"></i></a>
+        </div>
+        <div id="suppliers-list" class="space-y-2.5">
+          <div class="h-24 skeleton rounded-2xl"></div>
+          <div class="h-24 skeleton rounded-2xl"></div>
+        </div>
+      </div>
+
+      <!-- BULK CTA -->
+      <div class="bg-gradient-to-r from-orange-100 via-orange-50 to-amber-100 border border-orange-200 rounded-2xl p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-full bg-ali-orange text-white flex items-center justify-center flex-shrink-0">
+            <i data-lucide="handshake" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h4 class="font-extrabold text-xs text-orange-950">Bulk Orders & Custom Solutions</h4>
+            <p class="text-[9.5px] text-orange-800">Get better prices for bulk orders and customized vehicles.</p>
+          </div>
+        </div>
+        <a href="quotations.html" class="bg-ali-orange text-white font-bold text-[10px] px-3 py-2 rounded-xl whitespace-nowrap hover:bg-orange-600 transition flex items-center gap-0.5">
+          Request for Quotation <i data-lucide="arrow-right" class="w-3 h-3"></i>
+        </a>
+      </div>
     </div>
-    <div class="border-t border-slate-800 py-4 text-center text-xs text-slate-500">
-      © 2026 Alibaba.com. All rights reserved.
-    </div>
-  </footer>
+
+    <!-- RIGHT SIDEBAR (desktop) -->
+    <aside class="hidden lg:block col-span-2 space-y-4">
+      <div class="bg-white rounded-lg p-3 shadow-sm border border-gray-200 space-y-3">
+        <div>
+          <h3 class="font-extrabold text-sm text-gray-900">Welcome to Alibaba</h3>
+          <p class="text-[10px] text-gray-400">Here's your trading overview</p>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="bg-gray-50 rounded-lg p-2.5 border border-gray-100">
+            <div class="text-[9.5px] text-gray-500 mb-1">Active Orders</div>
+            <div class="text-lg font-black text-gray-900" id="stat-orders">0</div>
+          </div>
+          <div class="bg-gray-50 rounded-lg p-2.5 border border-gray-100">
+            <div class="text-[9.5px] text-gray-500 mb-1">Pending Quotes</div>
+            <div class="text-lg font-black text-gray-900" id="stat-quotes">0</div>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <a href="login.html" class="flex-1 text-center text-[10px] font-bold border border-gray-200 rounded-md py-2 hover:bg-gray-50">Sign In</a>
+          <a href="register.html" class="flex-1 text-center text-[10px] font-bold bg-ali-orange text-white rounded-md py-2 hover:bg-orange-600">Join Free</a>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg p-3 shadow-sm border border-gray-200 space-y-2">
+        <h3 class="font-bold text-xs text-gray-900 border-b border-gray-100 pb-2">Quick Access</h3>
+        <a href="orders.html" class="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded-md">
+          <div class="w-6 h-6 rounded bg-orange-100 flex items-center justify-center text-ali-orange"><i data-lucide="package" class="w-3.5 h-3.5"></i></div>
+          <div><div class="font-bold text-gray-900 text-[10.5px]">My Orders</div><div class="text-[9px] text-gray-400">Track & manage</div></div>
+        </a>
+        <a href="quotations.html" class="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded-md">
+          <div class="w-6 h-6 rounded bg-orange-100 flex items-center justify-center text-ali-orange"><i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i></div>
+          <div><div class="font-bold text-gray-900 text-[10.5px]">My Quotations</div><div class="text-[9px] text-gray-400">View quotes</div></div>
+        </a>
+        <a href="cart.html" class="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded-md">
+          <div class="w-6 h-6 rounded bg-orange-100 flex items-center justify-center text-ali-orange"><i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i></div>
+          <div><div class="font-bold text-gray-900 text-[10.5px]">Cart</div><div class="text-[9px] text-gray-400">Your items</div></div>
+        </a>
+        <a href="favorites.html" class="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded-md">
+          <div class="w-6 h-6 rounded bg-orange-100 flex items-center justify-center text-ali-orange"><i data-lucide="heart" class="w-3.5 h-3.5"></i></div>
+          <div><div class="font-bold text-gray-900 text-[10.5px]">Favorites</div><div class="text-[9px] text-gray-400">Saved products</div></div>
+        </a>
+      </div>
+
+      <div class="bg-white rounded-lg p-3 shadow-sm border border-gray-200 space-y-2">
+        <h3 class="font-bold text-xs text-gray-900 border-b border-gray-100 pb-2">Popular Searches</h3>
+        <div id="popular-searches" class="flex flex-wrap gap-1.5">
+          <a href="shop.html?q=electric+car" class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-[9.5px] hover:bg-gray-200">electric car</a>
+          <a href="shop.html?q=electric+bike" class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-[9.5px] hover:bg-gray-200">electric bike</a>
+          <a href="shop.html?q=lithium+battery" class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-[9.5px] hover:bg-gray-200">lithium battery</a>
+          <a href="shop.html?q=e-scooter" class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-[9.5px] hover:bg-gray-200">ev scooter</a>
+        </div>
+      </div>
+    </aside>
+  </main>
 
   <!-- MOBILE BOTTOM NAV -->
-  <nav class="bottom-nav lg:hidden fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 z-50 safe-area">
-    <div class="flex items-center justify-around h-14">
-      <a href="index.html" class="flex flex-col items-center gap-0.5 text-ali-orange">
-        <i class="fa-solid fa-house text-lg"></i>
-        <span class="text-[10px] font-semibold">Home</span>
-      </a>
-      <a href="shop.html" class="flex flex-col items-center gap-0.5 text-slate-400">
-        <i class="fa-solid fa-grid-2 text-lg"></i>
-        <span class="text-[10px]">Categories</span>
-      </a>
-      <a href="messages.html" class="flex flex-col items-center gap-0.5 text-slate-400 relative">
-        <i class="fa-solid fa-comment-dots text-lg"></i>
-        <span class="text-[10px]">Messages</span>
-      </a>
-      <a href="orders.html" class="flex flex-col items-center gap-0.5 text-slate-400">
-        <i class="fa-solid fa-clipboard-list text-lg"></i>
-        <span class="text-[10px]">Orders</span>
-      </a>
-      <a href="account.html" class="flex flex-col items-center gap-0.5 text-slate-400">
-        <i class="fa-regular fa-user text-lg"></i>
-        <span class="text-[10px]">Account</span>
-      </a>
-    </div>
+  <nav class="lg:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 py-2.5 px-6 flex justify-between items-center z-50">
+    <a href="index.html" class="flex flex-col items-center gap-0.5 text-ali-orange">
+      <i data-lucide="home" class="w-5 h-5"></i>
+      <span class="text-[10px] font-bold">Home</span>
+    </a>
+    <a href="shop.html" class="flex flex-col items-center gap-0.5 text-gray-500">
+      <i data-lucide="layout-grid" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold">Categories</span>
+    </a>
+    <a href="messages.html" class="flex flex-col items-center gap-0.5 text-gray-500 relative">
+      <i data-lucide="message-square" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold">Messages</span>
+    </a>
+    <a href="orders.html" class="flex flex-col items-center gap-0.5 text-gray-500">
+      <i data-lucide="clipboard-list" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold">Orders</span>
+    </a>
+    <a href="account.html" class="flex flex-col items-center gap-0.5 text-gray-500">
+      <i data-lucide="user" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold">Account</span>
+    </a>
   </nav>
 
   <script>
@@ -360,171 +328,144 @@
     const SUPABASE_KEY = "sb_publishable_m5osddO3GFnJlQYIvSHS3Q_WqF72WwV";
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // ========== CART ==========
+    // Cart
     function getCart() {
       try { return JSON.parse(localStorage.getItem('ali_cart') || '[]'); } catch { return []; }
     }
-    function saveCart(cart) {
-      localStorage.setItem('ali_cart', JSON.stringify(cart));
-      updateCartBadge();
-    }
     function updateCartBadge() {
-      const cart = getCart();
-      const count = cart.reduce((s, i) => s + (i.qty || 1), 0);
-      const badge = document.getElementById('cart-badge');
-      if (count > 0) {
-        badge.textContent = count > 99 ? '99+' : count;
-        badge.classList.remove('hidden');
-      } else {
-        badge.classList.add('hidden');
-      }
+      const n = getCart().reduce((s, i) => s + (i.qty || 1), 0);
+      ['cart-badge-d', 'cart-badge-m'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (n > 0) {
+          el.textContent = n > 99 ? '99+' : n;
+          el.classList.remove('hidden');
+          el.classList.add('flex');
+        } else {
+          el.classList.add('hidden');
+          el.classList.remove('flex');
+        }
+      });
     }
-    window.addToCart = function(product) {
-      const cart = getCart();
-      const existing = cart.find(i => i.id === product.id);
-      if (existing) existing.qty = (existing.qty || 1) + 1;
-      else cart.push({ id: product.id, title: product.title, price: product.price_min, image: product.main_image_url || (product.images && product.images[0]), qty: 1, moq: product.moq || 1 });
-      saveCart(cart);
-      alert('Added to cart');
-    };
 
-    // ========== HELPERS ==========
     function formatPrice(min, max, currency = 'USD') {
-      if (min == null && max == null) return 'Contact for price';
+      if (min == null && max == null) return 'Contact';
       const s = currency === 'USD' ? '$' : currency + ' ';
-      if (min != null && max != null && Number(min) !== Number(max)) {
-        return `${s}${Number(min).toLocaleString()} – ${s}${Number(max).toLocaleString()}`;
-      }
-      return `${s}${Number(min || max).toLocaleString()}`;
+      if (min != null && max != null && Number(min) !== Number(max))
+        return s + Number(min).toLocaleString() + ' - ' + s + Number(max).toLocaleString();
+      return s + Number(min || max).toLocaleString();
     }
 
+    // Product card — matches your mobile design
     function productCard(p) {
-      const img = p.main_image_url || (p.images && p.images[0]) || 'https://placehold.co/400x300?text=No+Image';
-      const badges = [];
-      if (p.is_top_seller) badges.push('<span class="bg-amber-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">Top Seller</span>');
-      if (p.is_hot) badges.push('<span class="bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">Hot</span>');
-      if (p.is_best_price) badges.push('<span class="bg-emerald-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">Best Price</span>');
-      if (p.is_featured) badges.push('<span class="bg-blue-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">Featured</span>');
+      const img = p.main_image_url || (p.images && p.images[0]) || 'https://placehold.co/300x200?text=No+Image';
+      let badge = '';
+      if (p.is_top_seller) badge = '<span class="absolute top-2.5 left-2.5 bg-ali-orange text-white text-[9px] font-bold px-2 py-0.5 rounded-full">Top Seller</span>';
+      else if (p.is_hot) badge = '<span class="absolute top-2.5 left-2.5 bg-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">Hot</span>';
+      else if (p.is_best_price) badge = '<span class="absolute top-2.5 left-2.5 bg-emerald-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">Best Price</span>';
+      else if (p.is_featured) badge = '<span class="absolute top-2.5 left-2.5 bg-blue-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">Featured</span>';
 
-      const supplierName = p.suppliers?.company_name || '';
-      const verified = p.suppliers?.is_verified || p.suppliers?.badge === 'verified' || p.suppliers?.is_gold;
+      const verified = p.suppliers?.is_verified || p.suppliers?.is_gold || p.suppliers?.badge === 'verified' || p.suppliers?.badge === 'gold';
 
       return `
-        <div class="bg-white rounded-xl border border-slate-100 overflow-hidden hover:shadow-md transition group">
-          <a href="product.html?id=${p.id}" class="block relative">
-            <div class="aspect-[4/3] bg-slate-50 overflow-hidden">
-              <img src="${img}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                   onerror="this.src='https://placehold.co/400x300?text=No+Image'">
-            </div>
-            ${badges.length ? `<div class="absolute top-2 left-2 flex flex-wrap gap-1">${badges.join('')}</div>` : ''}
-          </a>
-          <div class="p-3">
-            <a href="product.html?id=${p.id}">
-              <h3 class="text-sm font-semibold text-slate-900 line-clamp-2 min-h-[40px] mb-1 hover:text-ali-orange transition">${p.title}</h3>
+        <div class="flex-shrink-0 w-52 lg:w-auto bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-xs flex flex-col justify-between">
+          <div>
+            <a href="product.html?id=${p.id}" class="block relative h-36 bg-gray-50 flex items-center justify-center p-3">
+              ${badge}
+              <img src="${img}" class="h-28 object-contain max-w-full" alt="${p.title}" onerror="this.src='https://placehold.co/300x200?text=No'">
             </a>
-            <p class="text-ali-orange font-bold text-sm mb-0.5">${formatPrice(p.price_min, p.price_max, p.currency)}</p>
-            <p class="text-[11px] text-slate-500 mb-1">MOQ: ${p.moq || 1} units</p>
-            <div class="flex items-center gap-1 text-[11px] text-slate-500 mb-2">
-              ${p.country ? `<span class="flex items-center gap-0.5"><span class="text-sm">🇨🇳</span> ${p.country}</span>` : ''}
-              ${verified ? `<span class="text-blue-600 font-medium flex items-center gap-0.5 ml-1"><i class="fa-solid fa-circle-check text-[10px]"></i> Verified</span>` : ''}
+            <div class="p-3 space-y-1">
+              <a href="product.html?id=${p.id}"><h3 class="font-bold text-xs text-gray-900 line-clamp-2 min-h-[32px]">${p.title}</h3></a>
+              <div class="text-base font-extrabold text-ali-orange pt-0.5">${formatPrice(p.price_min, p.price_max, p.currency)}</div>
+              <div class="text-[10px] text-gray-400 font-medium">MOQ: ${p.moq || 1} units</div>
+              <div class="space-y-0.5 pt-1">
+                ${p.country ? `<div class="flex items-center gap-1 text-[10px] text-gray-600"><span>🇨🇳</span> ${p.country}</div>` : ''}
+                ${verified ? `<div class="flex items-center gap-1 text-[10px] text-blue-600 font-semibold"><i data-lucide="check-circle-2" class="w-3 h-3"></i> Verified Supplier</div>` : ''}
+              </div>
             </div>
-            <div class="flex gap-2">
-              <a href="product.html?id=${p.id}" class="flex-1 text-center text-[11px] font-bold border border-slate-200 rounded-lg py-2 hover:bg-slate-50 transition">Contact Supplier</a>
-              <a href="quotations.html?product=${p.id}" class="flex-1 text-center text-[11px] font-bold bg-ali-orange text-white rounded-lg py-2 hover:bg-ali-dark transition">Get Quote</a>
-            </div>
+          </div>
+          <div class="p-3 pt-0 grid grid-cols-2 gap-1.5">
+            <a href="product.html?id=${p.id}" class="bg-ali-orange text-white font-bold text-[10px] py-1.5 rounded-full text-center">Contact Supplier</a>
+            <a href="quotations.html?product=${p.id}" class="bg-white border border-ali-orange text-ali-orange font-bold text-[10px] py-1.5 rounded-full text-center">Get Quote</a>
           </div>
         </div>`;
     }
 
-    function supplierRow(s) {
-      const badge = (s.is_gold || s.badge === 'gold')
-        ? '<span class="bg-amber-100 text-amber-700 text-[10px] font-bold px-1.5 py-0.5 rounded">Gold Supplier</span>'
-        : (s.is_verified || s.badge === 'verified')
-          ? '<span class="bg-blue-100 text-blue-700 text-[10px] font-bold px-1.5 py-0.5 rounded">Verified</span>'
-          : '';
+    function supplierCard(s) {
+      const badge1 = (s.is_verified || s.badge === 'verified')
+        ? `<span class="bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5 text-[9.5px]"><i data-lucide="check" class="w-2.5 h-2.5"></i> Verified</span>` : '';
+      const badge2 = (s.is_gold || s.badge === 'gold')
+        ? `<span class="bg-amber-50 text-amber-700 font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5 text-[9.5px]"><i data-lucide="shield" class="w-2.5 h-2.5"></i> Gold Supplier</span>` : '';
       return `
-        <div class="bg-white rounded-xl border border-slate-100 p-4 flex flex-col sm:flex-row sm:items-center gap-3 hover:shadow-sm transition">
-          <div class="flex items-center gap-3 flex-1 min-w-0">
-            <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
+        <div class="bg-white rounded-2xl p-3.5 border border-gray-100 shadow-xs flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-11 h-11 rounded-full border border-gray-200 flex items-center justify-center flex-shrink-0 overflow-hidden bg-gray-50">
               ${s.logo_url
                 ? `<img src="${s.logo_url}" class="w-full h-full object-cover" alt="">`
-                : `<span class="font-bold text-slate-400 text-lg">${(s.company_name || 'S')[0]}</span>`}
+                : `<span class="font-black text-gray-500 text-sm">${(s.company_name || 'S')[0]}</span>`}
             </div>
-            <div class="min-w-0">
-              <div class="flex items-center gap-2 flex-wrap">
-                <p class="font-semibold text-slate-900 truncate">${s.company_name}</p>
-                ${badge}
-              </div>
-              <p class="text-[11px] text-slate-500 mt-0.5">${s.country || ''}${s.years_in_business ? ' · ' + s.years_in_business + '+ years' : ''}</p>
-              <p class="text-[11px] text-slate-400 truncate">${(s.main_products || []).slice(0, 4).join(', ') || 'Electric mobility products'}</p>
+            <div class="space-y-0.5 min-w-0">
+              <h4 class="font-extrabold text-xs text-gray-900 truncate">${s.company_name}</h4>
+              <div class="flex items-center gap-1.5 flex-wrap">${badge1}${badge2}</div>
+              <div class="text-[9.5px] text-gray-400">🇨🇳 ${s.country || '—'} ${s.years_in_business ? '| ' + s.years_in_business + '+ years' : ''}</div>
+              <div class="text-[9px] text-gray-400 truncate max-w-[180px]">${(s.main_products || []).slice(0, 4).join(', ') || 'Electric mobility products'}</div>
             </div>
           </div>
-          <div class="flex gap-2 flex-shrink-0">
-            <a href="supplier.html?id=${s.id}" class="text-xs font-bold border border-ali-orange text-ali-orange px-3 py-2 rounded-lg hover:bg-orange-50 transition">View Profile</a>
-            <a href="quotations.html" class="text-xs font-bold bg-ali-orange text-white px-3 py-2 rounded-lg hover:bg-ali-dark transition">Contact Supplier</a>
+          <div class="flex flex-col gap-1.5 flex-shrink-0">
+            <a href="quotations.html" class="bg-white border border-ali-orange text-ali-orange font-bold text-[10px] px-3 py-1.5 rounded-full text-center hover:bg-orange-50">Contact Supplier</a>
+            <a href="supplier.html?id=${s.id}" class="bg-gray-50 border border-gray-200 text-gray-700 font-bold text-[10px] px-3 py-1.5 rounded-full text-center">View Profile</a>
           </div>
         </div>`;
     }
 
-    // ========== LOAD DATA ==========
     async function loadCategories() {
       const { data } = await supabaseClient
         .from('categories')
-        .select('id, name, slug, icon')
+        .select('id, name, slug, icon, description')
         .eq('is_active', true)
         .order('sort_order');
 
       const cats = data || [];
       const icons = {
-        'electric-bikes': 'fa-bicycle',
-        'electric-motorcycles': 'fa-motorcycle',
-        'electric-cars': 'fa-car',
-        'electric-scooters': 'fa-scooter',
-        'batteries-charging': 'fa-battery-full',
-        'ev-components': 'fa-microchip'
+        'electric-bikes': 'bike',
+        'electric-motorcycles': 'circle-dot',
+        'electric-cars': 'car',
+        'electric-scooters': 'footprints',
+        'batteries-charging': 'battery-charging',
+        'ev-components': 'cpu'
       };
 
       // Desktop sidebar
-      document.getElementById('desktop-cats').innerHTML = cats.length
-        ? cats.map(c => `
-            <a href="shop.html?category=${c.slug}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-orange-50 hover:text-ali-orange transition">
-              <i class="fa-solid ${c.icon || icons[c.slug] || 'fa-tag'} w-5 text-slate-400"></i>
-              <span class="truncate">${c.name}</span>
-              <i class="fa-solid fa-chevron-right text-[10px] text-slate-300 ml-auto"></i>
-            </a>`).join('')
-        : '<p class="px-4 py-3 text-xs text-slate-400">No categories yet</p>';
+      const desk = document.getElementById('desktop-cats');
+      desk.innerHTML = cats.length ? cats.map(c => `
+        <a href="shop.html?category=${c.slug}" class="flex items-center justify-between p-2 rounded-md hover:bg-gray-50 group">
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="${c.icon || icons[c.slug] || 'tag'}" class="w-4 h-4 text-gray-700 group-hover:text-ali-orange"></i>
+            <div>
+              <div class="font-bold text-gray-900 text-[11px]">${c.name}</div>
+              <div class="text-[9.5px] text-gray-400 line-clamp-1">${c.description || ''}</div>
+            </div>
+          </div>
+          <i data-lucide="chevron-right" class="w-3 h-3 text-gray-400"></i>
+        </a>`).join('') : '<p class="text-[10px] text-gray-400 p-2">No categories yet</p>';
 
-      // Mobile menu
-      document.getElementById('mobile-menu-cats').innerHTML = `
-        <a href="index.html" class="flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-slate-50"><i class="fa-solid fa-house w-5 text-ali-orange"></i> Home</a>
-        <a href="shop.html" class="flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-slate-50"><i class="fa-solid fa-store w-5 text-ali-orange"></i> All Products</a>
-        <div class="border-t my-2"></div>
-        <p class="px-4 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Categories</p>
-        ${cats.map(c => `
-          <a href="shop.html?category=${c.slug}" class="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-slate-50">
-            <i class="fa-solid ${c.icon || icons[c.slug] || 'fa-tag'} w-5 text-slate-400"></i> ${c.name}
-          </a>`).join('')}
-        <div class="border-t my-2"></div>
-        <a href="suppliers.html" class="flex items-center gap-3 px-4 py-3 text-sm hover:bg-slate-50"><i class="fa-solid fa-building w-5 text-slate-400"></i> Suppliers</a>
-        <a href="quotations.html" class="flex items-center gap-3 px-4 py-3 text-sm hover:bg-slate-50"><i class="fa-solid fa-file-invoice w-5 text-slate-400"></i> Request Quote</a>
-        <a href="cart.html" class="flex items-center gap-3 px-4 py-3 text-sm hover:bg-slate-50"><i class="fa-solid fa-cart-shopping w-5 text-slate-400"></i> Cart</a>
-        <a href="account.html" class="flex items-center gap-3 px-4 py-3 text-sm hover:bg-slate-50"><i class="fa-regular fa-user w-5 text-slate-400"></i> Account</a>
-      `;
-
-      // Category cards
+      // Category cards (mobile horizontal + desktop grid)
       const cards = document.getElementById('category-cards');
       if (!cats.length) {
-        cards.innerHTML = '<p class="col-span-full text-center text-sm text-slate-400 py-6">No categories yet</p>';
+        cards.innerHTML = '<p class="text-sm text-gray-400 py-4">No categories yet</p>';
       } else {
         cards.innerHTML = cats.slice(0, 6).map(c => `
-          <a href="shop.html?category=${c.slug}" class="bg-white rounded-xl border border-slate-100 p-3 text-center hover:border-ali-orange hover:shadow-sm transition group">
-            <div class="w-10 h-10 rounded-full bg-orange-50 text-ali-orange flex items-center justify-center mx-auto mb-1.5 group-hover:bg-ali-orange group-hover:text-white transition">
-              <i class="fa-solid ${c.icon || icons[c.slug] || 'fa-tag'}"></i>
+          <a href="shop.html?category=${c.slug}" class="flex-shrink-0 w-24 lg:w-auto bg-white lg:bg-blue-50/60 rounded-xl lg:rounded-lg p-2.5 lg:p-3 border border-gray-100 lg:border-blue-100/50 text-center flex flex-col items-center justify-between hover:shadow-md transition">
+            <div class="h-12 lg:h-16 flex items-center justify-center">
+              <i data-lucide="${c.icon || icons[c.slug] || 'tag'}" class="w-8 h-8 text-ali-orange"></i>
             </div>
-            <p class="text-[11px] sm:text-xs font-semibold text-slate-800 line-clamp-2">${c.name}</p>
-            <p class="text-[10px] text-ali-orange font-medium mt-0.5">View All →</p>
+            <div class="w-full text-center lg:text-left">
+              <div class="font-bold text-gray-900 text-[10px] lg:text-xs line-clamp-2">${c.name}</div>
+              <span class="text-[9px] lg:text-[10px] text-ali-orange font-bold flex items-center justify-center lg:justify-start gap-0.5 mt-1">View All <i data-lucide="arrow-right" class="w-2.5 h-2.5"></i></span>
+            </div>
           </a>`).join('');
       }
+      lucide.createIcons();
     }
 
     async function loadProducts() {
@@ -542,14 +483,14 @@
       const el = document.getElementById('featured-products');
       if (error || !data || !data.length) {
         el.innerHTML = `
-          <div class="col-span-full bg-white rounded-xl border border-dashed border-slate-200 py-14 text-center">
-            <i class="fa-solid fa-box-open text-3xl text-slate-300 mb-2"></i>
-            <p class="text-slate-500 font-medium">No products published yet</p>
-            <p class="text-sm text-slate-400 mt-1">Products appear here when you publish them from admin</p>
+          <div class="w-full col-span-full bg-white rounded-2xl border border-dashed border-gray-200 py-14 text-center">
+            <p class="text-gray-500 font-medium text-sm">No products published yet</p>
+            <p class="text-gray-400 text-xs mt-1">Products appear here when you publish them from admin</p>
           </div>`;
         return;
       }
       el.innerHTML = data.map(productCard).join('');
+      lucide.createIcons();
     }
 
     async function loadSuppliers() {
@@ -562,41 +503,27 @@
 
       const el = document.getElementById('suppliers-list');
       if (!data || !data.length) {
-        el.innerHTML = `<div class="bg-white rounded-xl border border-dashed border-slate-200 py-10 text-center text-sm text-slate-400">No verified suppliers yet</div>`;
+        el.innerHTML = `<div class="bg-white rounded-2xl border border-dashed border-gray-200 py-10 text-center text-sm text-gray-400">No verified suppliers yet</div>`;
         return;
       }
-      el.innerHTML = data.map(supplierRow).join('');
+      el.innerHTML = data.map(supplierCard).join('');
+      lucide.createIcons();
     }
 
-    // Search
-    function doSearch() {
-      const q = document.getElementById('search-input').value.trim();
+    function doSearch(inputId) {
+      const q = document.getElementById(inputId)?.value.trim();
       window.location.href = q ? `shop.html?q=${encodeURIComponent(q)}` : 'shop.html';
     }
-    document.getElementById('search-btn').addEventListener('click', doSearch);
-    document.getElementById('search-input').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+    document.getElementById('desktop-search-btn')?.addEventListener('click', () => doSearch('desktop-search'));
+    document.getElementById('mobile-search-btn')?.addEventListener('click', () => doSearch('mobile-search'));
+    document.getElementById('desktop-search')?.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch('desktop-search'); });
+    document.getElementById('mobile-search')?.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch('mobile-search'); });
 
-    // Mobile menu
-    const drawer = document.getElementById('menu-drawer');
-    const backdrop = document.getElementById('menu-backdrop');
-    document.getElementById('menu-btn').addEventListener('click', () => {
-      drawer.classList.add('open');
-      backdrop.classList.add('open');
-      document.body.style.overflow = 'hidden';
-    });
-    function closeMenu() {
-      drawer.classList.remove('open');
-      backdrop.classList.remove('open');
-      document.body.style.overflow = '';
-    }
-    document.getElementById('close-menu').addEventListener('click', closeMenu);
-    backdrop.addEventListener('click', closeMenu);
-
-    // Init
     updateCartBadge();
     loadCategories();
     loadProducts();
     loadSuppliers();
+    lucide.createIcons();
   </script>
 </body>
 </html>
