@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Request Quotation – EVSource</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              orange: '#FF6A00',
+              dark: '#E55A00'
+            }
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>body { font-family: 'Inter', system-ui, sans-serif; }</style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 antialiased">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+    <div class="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
+      <a href="javascript:history.back()" class="w-9 h-9 rounded-full hover:bg-slate-100 flex items-center justify-center">
+        <i class="fa-solid fa-arrow-left text-slate-600"></i>
+      </a>
+      <div>
+        <h1 class="font-bold text-slate-900 text-sm">Request Quotation</h1>
+        <p class="text-[11px] text-slate-500">Get a custom price from supplier</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-lg mx-auto px-4 py-6">
+
+    <!-- Product card (if linked from a product) -->
+    <div id="product-card" class="hidden bg-white rounded-2xl border border-slate-100 p-4 mb-5 flex gap-3 shadow-sm">
+      <img id="product-img" src="" class="w-16 h-16 rounded-xl object-cover bg-slate-100" alt="">
+      <div class="flex-1 min-w-0">
+        <p id="product-title" class="font-semibold text-slate-900 text-sm line-clamp-2"></p>
+        <p id="product-price" class="text-brand-orange font-bold text-sm mt-0.5"></p>
+      </div>
+    </div>
+
+    <!-- Success state -->
+    <div id="success-box" class="hidden bg-white rounded-2xl border border-slate-100 p-6 text-center shadow-sm">
+      <div class="w-14 h-14 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-3">
+        <i class="fa-solid fa-check text-xl"></i>
+      </div>
+      <h2 class="font-bold text-slate-900 text-lg mb-1">Quotation Requested</h2>
+      <p class="text-sm text-slate-500 mb-4">We have received your request. The supplier will reply soon.</p>
+      <p class="text-xs text-slate-400 mb-1">Reference</p>
+      <p class="font-mono font-bold text-brand-orange text-lg mb-5" id="ref-number">—</p>
+      <div class="flex flex-col gap-2">
+        <a href="index.html" class="bg-brand-orange hover:bg-brand-dark text-white font-bold py-3 rounded-xl transition">Back to Home</a>
+        <a href="shop.html" class="border border-slate-200 text-slate-700 font-semibold py-3 rounded-xl hover:bg-slate-50 transition">Browse More Products</a>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <form id="quote-form" class="space-y-4">
+      <div class="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm space-y-4">
+        <h2 class="font-bold text-slate-900">Your Details</h2>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Full Name *</label>
+          <input id="full_name" type="text" required placeholder="Your full name"
+                 class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Phone Number *</label>
+          <input id="phone" type="tel" required placeholder="e.g. 08012345678"
+                 class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
+          <input id="email" type="email" placeholder="you@email.com"
+                 class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Company (optional)</label>
+          <input id="company" type="text" placeholder="Company name"
+                 class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange">
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm space-y-4">
+        <h2 class="font-bold text-slate-900">Quotation Details</h2>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Quantity *</label>
+          <input id="quantity" type="number" required min="1" value="1"
+                 class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Target Price (optional)</label>
+          <input id="target_price" type="number" min="0" step="0.01" placeholder="What price are you looking for?"
+                 class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Message *</label>
+          <textarea id="message" rows="4" required placeholder="Describe your requirements, specifications, destination port, etc."
+                    class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange resize-none"></textarea>
+        </div>
+      </div>
+
+      <div class="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 text-sm text-blue-800">
+        <i class="fa-solid fa-circle-info mr-1.5"></i>
+        The supplier will review and reply with a quote. No payment is required now.
+      </div>
+
+      <button type="submit" id="submit-btn"
+              class="w-full bg-brand-orange hover:bg-brand-dark text-white font-bold py-3.5 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20">
+        <span id="btn-text">Submit Request</span>
+        <i id="btn-spinner" class="fa-solid fa-spinner fa-spin hidden"></i>
+      </button>
+    </form>
+  </main>
+
+  <script>
+    const SUPABASE_URL = "https://zgbdhpebmjokbaeflqhj.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_m5osddO3GFnJlQYIvSHS3Q_WqF72WwV";
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const params = new URLSearchParams(window.location.search);
+    const productId = params.get('product') || params.get('id');
+    let product = null;
+
+    function formatPrice(min, max, currency = 'USD') {
+      if (min == null && max == null) return '';
+      const s = currency === 'USD' ? '$' : currency + ' ';
+      if (min != null && max != null && min !== max) return `${s}${Number(min).toLocaleString()} – ${s}${Number(max).toLocaleString()}`;
+      return `${s}${Number(min || max).toLocaleString()}`;
+    }
+
+    async function loadProduct() {
+      if (!productId) return;
+      const { data } = await supabaseClient
+        .from('products')
+        .select('id, title, price_min, price_max, currency, moq, main_image_url, images, supplier_id, status')
+        .eq('id', productId)
+        .single();
+
+      if (!data) return;
+      product = data;
+
+      const img = data.main_image_url || (data.images && data.images[0]) || 'https://placehold.co/80x80?text=No';
+      document.getElementById('product-img').src = img;
+      document.getElementById('product-title').textContent = data.title;
+      document.getElementById('product-price').textContent = formatPrice(data.price_min, data.price_max, data.currency);
+      document.getElementById('product-card').classList.remove('hidden');
+      document.getElementById('quantity').value = data.moq || 1;
+      document.getElementById('quantity').min = data.moq || 1;
+    }
+
+    function generateQuoteNumber() {
+      return 'QT' + Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
+    }
+
+    document.getElementById('quote-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const full_name = document.getElementById('full_name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const company = document.getElementById('company').value.trim();
+      const quantity = parseInt(document.getElementById('quantity').value) || 1;
+      const target_price = parseFloat(document.getElementById('target_price').value) || null;
+      const message = document.getElementById('message').value.trim();
+
+      const btn = document.getElementById('submit-btn');
+      const btnText = document.getElementById('btn-text');
+      const spinner = document.getElementById('btn-spinner');
+      btn.disabled = true;
+      btnText.textContent = 'Submitting...';
+      spinner.classList.remove('hidden');
+
+      try {
+        const quoteNumber = generateQuoteNumber();
+        const title = product
+          ? `Quote for: ${product.title}`
+          : `Quote request from ${full_name}`;
+
+        // Store contact info inside message for admin (no buyer account required)
+        const fullMessage = [
+          message,
+          '',
+          '--- Contact ---',
+          `Name: ${full_name}`,
+          `Phone: ${phone}`,
+          email ? `Email: ${email}` : null,
+          company ? `Company: ${company}` : null
+        ].filter(Boolean).join('\n');
+
+        const payload = {
+          quotation_number: quoteNumber,
+          product_id: product?.id || null,
+          supplier_id: product?.supplier_id || null,
+          title,
+          message: fullMessage,
+          quantity,
+          target_price,
+          status: 'pending'
+          // buyer_id can stay null for guest RFQs
+        };
+
+        const { data, error } = await supabaseClient
+          .from('quotations')
+          .insert([payload])
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        document.getElementById('quote-form').classList.add('hidden');
+        document.getElementById('product-card').classList.add('hidden');
+        document.getElementById('ref-number').textContent = data.quotation_number || quoteNumber;
+        document.getElementById('success-box').classList.remove('hidden');
+
+      } catch (err) {
+        console.error(err);
+        alert(err.message || 'Failed to submit quotation request');
+        btn.disabled = false;
+        btnText.textContent = 'Submit Request';
+        spinner.classList.add('hidden');
+      }
+    });
+
+    loadProduct();
+  </script>
+</body>
+</html>
