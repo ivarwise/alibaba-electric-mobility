@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verified Suppliers – Alibaba</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+    body { font-family: 'Inter', system-ui, sans-serif; background: #F3F4F6; }
+    .text-ali-orange { color: #FF6600; }
+    .bg-ali-orange { background-color: #FF6600; }
+    .border-ali-orange { border-color: #FF6600; }
+    .skeleton {
+      background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+  </style>
+</head>
+<body class="min-h-screen text-xs pb-20 lg:pb-0">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
+    <div class="max-w-5xl mx-auto px-4 h-14 flex items-center gap-3">
+      <a href="index.html" class="w-9 h-9 rounded-full hover:bg-gray-100 flex items-center justify-center">
+        <i data-lucide="arrow-left" class="w-5 h-5 text-gray-600"></i>
+      </a>
+      <div>
+        <h1 class="font-bold text-gray-900 text-sm">Verified Suppliers</h1>
+        <p class="text-[10px] text-gray-400" id="count-label">Loading...</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 py-5">
+
+    <!-- Search -->
+    <div class="mb-4">
+      <div class="relative">
+        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        <input id="search-input" type="search" placeholder="Search suppliers by name, country..."
+               class="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-ali-orange" />
+      </div>
+    </div>
+
+    <!-- List -->
+    <div id="suppliers-list" class="space-y-3">
+      <div class="h-28 skeleton rounded-2xl"></div>
+      <div class="h-28 skeleton rounded-2xl"></div>
+      <div class="h-28 skeleton rounded-2xl"></div>
+    </div>
+
+    <div id="empty" class="hidden py-16 text-center">
+      <i data-lucide="building-2" class="w-10 h-10 text-gray-300 mx-auto mb-3"></i>
+      <p class="text-gray-500 font-medium">No suppliers found</p>
+      <p class="text-gray-400 text-xs mt-1">Try another search or check back later</p>
+    </div>
+  </main>
+
+  <!-- Mobile bottom nav -->
+  <nav class="lg:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 py-2.5 px-6 flex justify-between items-center z-50">
+    <a href="index.html" class="flex flex-col items-center gap-0.5 text-gray-500">
+      <i data-lucide="home" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold">Home</span>
+    </a>
+    <a href="shop.html" class="flex flex-col items-center gap-0.5 text-gray-500">
+      <i data-lucide="layout-grid" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold">Categories</span>
+    </a>
+    <a href="cart.html" class="flex flex-col items-center gap-0.5 text-gray-500">
+      <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold">Cart</span>
+    </a>
+    <a href="orders.html" class="flex flex-col items-center gap-0.5 text-gray-500">
+      <i data-lucide="clipboard-list" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold">Orders</span>
+    </a>
+    <a href="account.html" class="flex flex-col items-center gap-0.5 text-gray-500">
+      <i data-lucide="user" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold">Account</span>
+    </a>
+  </nav>
+
+  <script>
+    const SUPABASE_URL = "https://zgbdhpebmjokbaeflqhj.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_m5osddO3GFnJlQYIvSHS3Q_WqF72WwV";
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let allSuppliers = [];
+
+    function supplierCard(s) {
+      const badge1 = (s.is_verified || s.badge === 'verified')
+        ? `<span class="bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5 text-[9.5px]"><i data-lucide="check" class="w-2.5 h-2.5"></i> Verified</span>` : '';
+      const badge2 = (s.is_gold || s.badge === 'gold')
+        ? `<span class="bg-amber-50 text-amber-700 font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5 text-[9.5px]"><i data-lucide="shield" class="w-2.5 h-2.5"></i> Gold Supplier</span>` : '';
+
+      return `
+        <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center flex-shrink-0 overflow-hidden bg-gray-50">
+              ${s.logo_url
+                ? `<img src="${s.logo_url}" class="w-full h-full object-cover" alt="">`
+                : `<span class="font-black text-gray-500 text-base">${(s.company_name || 'S')[0]}</span>`}
+            </div>
+            <div class="space-y-0.5 min-w-0">
+              <h3 class="font-extrabold text-sm text-gray-900 truncate">${s.company_name}</h3>
+              <div class="flex items-center gap-1.5 flex-wrap">${badge1}${badge2}</div>
+              <div class="text-[10px] text-gray-400">
+                ${s.country ? '🇨🇳 ' + s.country : ''}${s.years_in_business ? ' · ' + s.years_in_business + '+ years' : ''}
+              </div>
+              <div class="text-[10px] text-gray-400 truncate">
+                ${(s.main_products || []).slice(0, 5).join(', ') || 'Electric mobility products'}
+              </div>
+            </div>
+          </div>
+          <div class="flex gap-2 flex-shrink-0">
+            <a href="supplier.html?id=${s.id}"
+               class="flex-1 sm:flex-none text-center bg-gray-50 border border-gray-200 text-gray-700 font-bold text-[11px] px-4 py-2 rounded-full hover:bg-gray-100 transition">
+              View Profile
+            </a>
+            <a href="quotations.html"
+               class="flex-1 sm:flex-none text-center bg-white border border-ali-orange text-ali-orange font-bold text-[11px] px-4 py-2 rounded-full hover:bg-orange-50 transition">
+              Contact
+            </a>
+          </div>
+        </div>`;
+    }
+
+    function render(list) {
+      const el = document.getElementById('suppliers-list');
+      const empty = document.getElementById('empty');
+      document.getElementById('count-label').textContent = list.length + ' supplier' + (list.length !== 1 ? 's' : '');
+
+      if (!list.length) {
+        el.innerHTML = '';
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+      el.innerHTML = list.map(supplierCard).join('');
+      lucide.createIcons();
+    }
+
+    async function load() {
+      try {
+        const { data, error } = await supabaseClient
+          .from('suppliers')
+          .select('id, company_name, logo_url, country, years_in_business, badge, is_verified, is_gold, main_products, is_active')
+          .eq('is_active', true)
+          .order('is_gold', { ascending: false })
+          .order('company_name');
+
+        if (error) throw error;
+        allSuppliers = data || [];
+        render(allSuppliers);
+      } catch (e) {
+        document.getElementById('suppliers-list').innerHTML =
+          `<div class="py-12 text-center text-red-500 text-sm">Failed to load: ${e.message}</div>`;
+      }
+    }
+
+    document.getElementById('search-input').addEventListener('input', () => {
+      const q = document.getElementById('search-input').value.toLowerCase().trim();
+      if (!q) return render(allSuppliers);
+      render(allSuppliers.filter(s =>
+        (s.company_name || '').toLowerCase().includes(q) ||
+        (s.country || '').toLowerCase().includes(q) ||
+        (s.main_products || []).join(' ').toLowerCase().includes(q)
+      ));
+    });
+
+    load();
+    lucide.createIcons();
+  </script>
+</body>
+</html>
