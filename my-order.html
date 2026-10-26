@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Order – EVSource</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { orange: '#FF6A00', dark: '#E55A00' }
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .msg-admin { background: #FF6A00; color: white; border-radius: 16px 16px 4px 16px; }
+    .msg-customer { background: #f1f5f9; color: #1e293b; border-radius: 16px 16px 16px 4px; }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 antialiased">
+
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+    <div class="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
+      <a href="index.html" class="w-9 h-9 rounded-full hover:bg-slate-100 flex items-center justify-center">
+        <i class="fa-solid fa-house text-slate-600"></i>
+      </a>
+      <div>
+        <h1 class="font-bold text-slate-900 text-sm">My Order</h1>
+        <p class="text-[11px] text-slate-500" id="header-num">—</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-lg mx-auto px-4 py-5 pb-28">
+
+    <div id="loading" class="py-16 text-center text-slate-400">
+      <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
+      <p class="text-sm">Loading order...</p>
+    </div>
+
+    <div id="content" class="hidden space-y-4">
+
+      <!-- Status banner -->
+      <div id="status-banner" class="rounded-2xl p-4 text-center">
+        <!-- filled by JS -->
+      </div>
+
+      <!-- Order summary -->
+      <div class="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm">
+        <div class="flex gap-3">
+          <img id="product-img" src="" class="w-14 h-14 rounded-xl object-cover bg-slate-100" alt="">
+          <div class="flex-1 min-w-0">
+            <p class="font-semibold text-slate-900 text-sm line-clamp-2" id="product-title">—</p>
+            <p class="text-xs text-slate-500 mt-0.5">Qty: <span id="qty">—</span></p>
+            <p class="font-bold text-brand-orange text-sm mt-1" id="total">—</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat -->
+      <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col" style="height: 420px;">
+        <div class="px-4 py-3 border-b border-slate-100">
+          <p class="font-bold text-slate-900 text-sm">Chat with us</p>
+          <p class="text-[11px] text-slate-500">We will send payment details here</p>
+        </div>
+
+        <div id="chat-box" class="flex-1 overflow-y-auto p-3 space-y-2.5 bg-slate-50">
+          <!-- messages -->
+        </div>
+
+        <div class="p-3 border-t border-slate-100 bg-white">
+          <div id="file-preview" class="hidden mb-2 flex items-center gap-2 text-xs text-slate-600 bg-slate-50 rounded-lg px-3 py-2">
+            <i class="fa-solid fa-paperclip"></i>
+            <span id="file-name"></span>
+            <button type="button" onclick="clearFile()" class="ml-auto text-red-500"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          <div class="flex items-end gap-2">
+            <label class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center cursor-pointer flex-shrink-0">
+              <i class="fa-solid fa-camera text-slate-500"></i>
+              <input type="file" id="file-input" accept="image/*,.pdf" class="hidden">
+            </label>
+            <textarea id="msg-input" rows="1" placeholder="Type a message..."
+                      class="flex-1 border border-slate-200 rounded-xl px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand-orange/20 max-h-24"></textarea>
+            <button id="send-btn" class="w-10 h-10 rounded-xl bg-brand-orange hover:bg-brand-dark text-white flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-paper-plane text-sm"></i>
+            </button>
+          </div>
+          <p class="text-[10px] text-slate-400 mt-1.5 text-center">Upload payment receipt using the camera icon</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    const SUPABASE_URL = "https://zgbdhpebmjokbaeflqhj.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_m5osddO3GFnJlQYIvSHS3Q_WqF72WwV";
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const orderId = new URLSearchParams(window.location.search).get('id');
+    let currentOrder = null;
+    let selectedFile = null;
+    const GUEST_ID = 'customer-' + (localStorage.getItem('ev_guest_id') || (localStorage.setItem('ev_guest_id', Math.random().toString(36).slice(2)), localStorage.getItem('ev_guest_id')));
+
+    function statusUI(status) {
+      const map = {
+        pending: {
+          bg: 'bg-amber-50 border border-amber-100',
+          icon: 'fa-clock text-amber-500',
+          title: 'Waiting for payment instructions',
+          sub: 'We will send bank details in the chat below. Please wait.'
+        },
+        confirmed: {
+          bg: 'bg-blue-50 border border-blue-100',
+          icon: 'fa-circle-check text-blue-500',
+          title: 'Payment confirmed',
+          sub: 'We are preparing your order.'
+        },
+        in_production: {
+          bg: 'bg-violet-50 border border-violet-100',
+          icon: 'fa-gear text-violet-500',
+          title: 'Processing',
+          sub: 'Your order is being processed.'
+        },
+        shipped: {
+          bg: 'bg-cyan-50 border border-cyan-100',
+          icon: 'fa-truck text-cyan-500',
+          title: 'Ready for pickup / Shipped',
+          sub: 'Your order is on the way or ready for collection.'
+        },
+        delivered: {
+          bg: 'bg-emerald-50 border border-emerald-100',
+          icon: 'fa-check-double text-emerald-500',
+          title: 'Delivered',
+          sub: 'Thank you for ordering with EVSource.'
+        },
+        cancelled: {
+          bg: 'bg-red-50 border border-red-100',
+          icon: 'fa-xmark text-red-500',
+          title: 'Cancelled',
+          sub: 'This order was cancelled.'
+        }
+      };
+      return map[status] || map.pending;
+    }
+
+    function formatMoney(amount, currency = 'USD') {
+      if (amount == null) return '—';
+      const s = currency === 'USD' ? '$' : currency + ' ';
+      return s + Number(amount).toLocaleString();
+    }
+
+    async function loadOrder() {
+      if (!orderId) {
+        document.getElementById('loading').innerHTML = '<p class="text-red-500 text-sm">Invalid order link</p>';
+        return;
+      }
+
+      const { data, error } = await supabaseClient
+        .from('orders')
+        .select(`*, products (title, main_image_url, images)`)
+        .eq('id', orderId)
+        .single();
+
+      if (error || !data) {
+        document.getElementById('loading').innerHTML = '<p class="text-red-500 text-sm">Order not found</p>';
+        return;
+      }
+
+      currentOrder = data;
+      document.getElementById('header-num').textContent = data.order_number || data.id.slice(0, 8);
+
+      const st = statusUI(data.status);
+      document.getElementById('status-banner').className = `rounded-2xl p-4 text-center ${st.bg}`;
+      document.getElementById('status-banner').innerHTML = `
+        <i class="fa-solid ${st.icon} text-2xl mb-2"></i>
+        <p class="font-bold text-slate-900">${st.title}</p>
+        <p class="text-xs text-slate-600 mt-1">${st.sub}</p>
+        <p class="text-[11px] text-slate-400 mt-2">Order ${data.order_number || data.id.slice(0, 8)}</p>`;
+
+      const img = data.products?.main_image_url || (data.products?.images && data.products.images[0]) || 'https://placehold.co/80x80?text=No';
+      document.getElementById('product-img').src = img;
+      document.getElementById('product-title').textContent = data.products?.title || 'Product';
+      document.getElementById('qty').textContent = data.quantity;
+      document.getElementById('total').textContent = formatMoney(data.total_amount, data.currency);
+
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('content').classList.remove('hidden');
+
+      await loadMessages();
+    }
+
+    async function loadMessages() {
+      const box = document.getElementById('chat-box');
+      const { data } = await supabaseClient
+        .from('messages')
+        .select('*')
+        .eq('conversation_id', orderId)
+        .order('created_at', { ascending: true });
+
+      const msgs = data || [];
+      if (!msgs.length) {
+        box.innerHTML = `<div class="text-center text-slate-400 text-xs py-8">Waiting for our reply...<br>Payment details will appear here</div>`;
+        return;
+      }
+
+      box.innerHTML = msgs.map(m => {
+        const isCustomer = String(m.sender_id).startsWith('guest-') || m.sender_id === GUEST_ID;
+        const time = new Date(m.created_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        let body = m.content || '';
+        const imgMatch = body.match(/(https?:\/\/[^\s]+\.(jpg|jpeg|png|webp|gif|pdf))/i);
+        if (imgMatch) {
+          const url = imgMatch[0];
+          if (url.match(/\.pdf$/i)) {
+            body = body.replace(url, '') + `<a href="${url}" target="_blank" class="block mt-2 text-xs underline">View PDF receipt</a>`;
+          } else {
+            body = body.replace(url, '') + `<img src="${url}" class="mt-2 rounded-lg max-w-[200px]" onclick="window.open('${url}')">`;
+          }
+        }
+        return `
+          <div class="flex ${isCustomer ? 'justify-end' : 'justify-start'}">
+            <div class="max-w-[80%] px-3 py-2 text-sm ${isCustomer ? 'msg-customer' : 'msg-admin'}">
+              <div class="whitespace-pre-wrap break-words">${body}</div>
+              <p class="text-[10px] mt-1 ${isCustomer ? 'text-slate-400' : 'text-white/70'}">${time}</p>
+            </div>
+          </div>`;
+      }).join('');
+      box.scrollTop = box.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const text = document.getElementById('msg-input').value.trim();
+      if (!text && !selectedFile) return;
+
+      let content = text;
+      if (selectedFile) {
+        const ext = selectedFile.name.split('.').pop() || 'jpg';
+        const path = `order-files/${orderId}/${Date.now()}.${ext}`;
+        const { error: upErr } = await supabaseClient.storage
+          .from('product-images')
+          .upload(path, selectedFile, { upsert: false });
+        if (upErr) return alert('Upload failed: ' + upErr.message);
+        const { data: urlData } = supabaseClient.storage.from('product-images').getPublicUrl(path);
+        content = (content ? content + '\n' : '') + urlData.publicUrl;
+      }
+
+      const { error } = await supabaseClient.from('messages').insert([{
+        conversation_id: orderId,
+        sender_id: GUEST_ID,
+        receiver_id: 'admin',
+        content,
+        is_read: false
+      }]);
+
+      if (error) return alert(error.message);
+      document.getElementById('msg-input').value = '';
+      clearFile();
+      await loadMessages();
+    }
+
+    document.getElementById('send-btn').addEventListener('click', sendMessage);
+    document.getElementById('msg-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    });
+
+    document.getElementById('file-input').addEventListener('change', e => {
+      const f = e.target.files[0];
+      if (!f) return;
+      selectedFile = f;
+      document.getElementById('file-preview').classList.remove('hidden');
+      document.getElementById('file-name').textContent = f.name;
+    });
+
+    window.clearFile = function() {
+      selectedFile = null;
+      document.getElementById('file-input').value = '';
+      document.getElementById('file-preview').classList.add('hidden');
+    };
+
+    loadOrder();
+    setInterval(() => { if (currentOrder) loadMessages(); }, 8000);
+  </script>
+</body>
+</html>
