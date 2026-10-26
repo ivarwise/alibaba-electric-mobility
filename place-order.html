@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Place Order – EVSource</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { orange: '#FF6A00', dark: '#E55A00' }
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>body { font-family: 'Inter', system-ui, sans-serif; }</style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 antialiased">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+    <div class="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
+      <a href="javascript:history.back()" class="w-9 h-9 rounded-full hover:bg-slate-100 flex items-center justify-center">
+        <i class="fa-solid fa-arrow-left text-slate-600"></i>
+      </a>
+      <h1 class="font-bold text-slate-900">Place Order</h1>
+    </div>
+  </header>
+
+  <main class="max-w-lg mx-auto px-4 py-6">
+
+    <!-- Product summary -->
+    <div id="product-card" class="bg-white rounded-2xl border border-slate-100 p-4 mb-5 flex gap-3 shadow-sm">
+      <div class="w-16 h-16 rounded-xl bg-slate-100 skeleton"></div>
+      <div class="flex-1">
+        <div class="h-4 bg-slate-100 rounded w-3/4 mb-2 skeleton"></div>
+        <div class="h-3 bg-slate-100 rounded w-1/2 skeleton"></div>
+      </div>
+    </div>
+
+    <form id="order-form" class="space-y-4">
+      <div class="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm space-y-4">
+        <h2 class="font-bold text-slate-900">Your Details</h2>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Full Name *</label>
+          <input id="full_name" type="text" required placeholder="Your full name"
+                 class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Phone Number *</label>
+          <input id="phone" type="tel" required placeholder="e.g. 08012345678"
+                 class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
+          <input id="email" type="email" placeholder="you@email.com"
+                 class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Delivery Address *</label>
+          <textarea id="address" rows="2" required placeholder="Street, area, city..."
+                    class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange resize-none"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">City</label>
+            <input id="city" type="text" placeholder="City"
+                   class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">State</label>
+            <input id="state" type="text" placeholder="State"
+                   class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange">
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm space-y-4">
+        <h2 class="font-bold text-slate-900">Order</h2>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Quantity *</label>
+          <input id="quantity" type="number" required min="1" value="1"
+                 class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange">
+          <p class="text-xs text-slate-400 mt-1">MOQ: <span id="moq-text">1</span></p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Notes (optional)</label>
+          <textarea id="notes" rows="2" placeholder="Any special request..."
+                    class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange resize-none"></textarea>
+        </div>
+      </div>
+
+      <div class="bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-sm text-amber-800">
+        <i class="fa-solid fa-circle-info mr-1.5"></i>
+        After placing order, you will receive payment instructions from us. No automatic payment.
+      </div>
+
+      <button type="submit" id="submit-btn"
+              class="w-full bg-brand-orange hover:bg-brand-dark text-white font-bold py-3.5 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20">
+        <span id="btn-text">Place Order</span>
+        <i id="btn-spinner" class="fa-solid fa-spinner fa-spin hidden"></i>
+      </button>
+    </form>
+  </main>
+
+  <script>
+    const SUPABASE_URL = "https://zgbdhpebmjokbaeflqhj.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_m5osddO3GFnJlQYIvSHS3Q_WqF72WwV";
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const params = new URLSearchParams(window.location.search);
+    const productId = params.get('product') || params.get('id');
+    let product = null;
+
+    async function loadProduct() {
+      if (!productId) {
+        document.getElementById('product-card').innerHTML = '<p class="text-red-500 text-sm">No product selected. Go back and choose a product.</p>';
+        return;
+      }
+      const { data, error } = await supabaseClient
+        .from('products')
+        .select('id, title, price_min, price_max, currency, moq, main_image_url, images, supplier_id, status')
+        .eq('id', productId)
+        .single();
+
+      if (error || !data) {
+        document.getElementById('product-card').innerHTML = '<p class="text-red-500 text-sm">Product not found</p>';
+        return;
+      }
+      product = data;
+      const img = data.main_image_url || (data.images && data.images[0]) || 'https://placehold.co/80x80?text=No';
+      const price = data.price_min != null
+        ? (data.currency === 'USD' ? '$' : data.currency + ' ') + Number(data.price_min).toLocaleString()
+        : 'Contact for price';
+
+      document.getElementById('product-card').innerHTML = `
+        <img src="${img}" class="w-16 h-16 rounded-xl object-cover bg-slate-100" onerror="this.src='https://placehold.co/80x80?text=No'">
+        <div class="flex-1 min-w-0">
+          <p class="font-semibold text-slate-900 text-sm line-clamp-2">${data.title}</p>
+          <p class="text-brand-orange font-bold text-sm mt-0.5">${price}</p>
+        </div>`;
+      document.getElementById('moq-text').textContent = data.moq || 1;
+      document.getElementById('quantity').min = data.moq || 1;
+      document.getElementById('quantity').value = data.moq || 1;
+    }
+
+    function generateOrderNumber() {
+      return 'EV' + Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
+    }
+
+    document.getElementById('order-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!product) return alert('Product not loaded');
+
+      const full_name = document.getElementById('full_name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const address = document.getElementById('address').value.trim();
+      const city = document.getElementById('city').value.trim();
+      const state = document.getElementById('state').value.trim();
+      const quantity = parseInt(document.getElementById('quantity').value) || 1;
+      const notes = document.getElementById('notes').value.trim();
+
+      if (quantity < (product.moq || 1)) {
+        return alert(`Minimum order quantity is ${product.moq || 1}`);
+      }
+
+      const btn = document.getElementById('submit-btn');
+      const btnText = document.getElementById('btn-text');
+      const spinner = document.getElementById('btn-spinner');
+      btn.disabled = true;
+      btnText.textContent = 'Placing order...';
+      spinner.classList.remove('hidden');
+
+      try {
+        const unitPrice = product.price_min || 0;
+        const total = unitPrice * quantity;
+        const orderNumber = generateOrderNumber();
+
+        const { data: order, error } = await supabaseClient
+          .from('orders')
+          .insert([{
+            order_number: orderNumber,
+            supplier_id: product.supplier_id,
+            product_id: product.id,
+            quantity,
+            unit_price: unitPrice,
+            total_amount: total,
+            currency: product.currency || 'USD',
+            status: 'pending',
+            notes: notes || null,
+            shipping_address: {
+              full_name,
+              phone,
+              email,
+              address,
+              city,
+              state
+            }
+            // buyer_id can be null for guest orders
+          }])
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        // Go to order tracking + chat page
+        window.location.href = `my-order.html?id=${order.id}`;
+      } catch (err) {
+        console.error(err);
+        alert(err.message || 'Failed to place order');
+        btn.disabled = false;
+        btnText.textContent = 'Place Order';
+        spinner.classList.add('hidden');
+      }
+    });
+
+    loadProduct();
+  </script>
+</body>
+</html>
