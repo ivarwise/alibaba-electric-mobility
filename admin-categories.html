@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Categories – EVSource Admin</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              orange: '#FF6A00',
+              dark: '#E55A00',
+              navy: '#0F172A'
+            }
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .sidebar-link.active { background: rgba(255, 106, 0, 0.12); color: #FF6A00; }
+    .skeleton {
+      background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+  </style>
+</head>
+
+<body class="bg-slate-100 text-slate-800 antialiased">
+
+  <div class="flex min-h-screen">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 text-white transform -translate-x-full lg:translate-x-0 transition-transform duration-200">
+      <div class="flex flex-col h-full">
+        <div class="px-6 py-5 border-b border-slate-800">
+          <a href="admin-dashboard.html" class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-brand-orange flex items-center justify-center text-white font-black text-sm">EV</div>
+            <div>
+              <p class="font-bold text-white leading-none">EVSource</p>
+              <p class="text-[10px] text-slate-500">Admin Panel</p>
+            </div>
+          </a>
+        </div>
+
+        <nav class="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
+          <p class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Main</p>
+          <a href="admin-dashboard.html" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa-solid fa-chart-pie w-5 text-center"></i> Dashboard
+          </a>
+          <a href="admin-products.html" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa-solid fa-box w-5 text-center"></i> Products
+          </a>
+          <a href="admin-suppliers.html" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa-solid fa-building w-5 text-center"></i> Suppliers
+          </a>
+          <a href="admin-orders.html" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa-solid fa-cart-shopping w-5 text-center"></i> Orders
+          </a>
+          <a href="admin-quotations.html" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa-solid fa-file-invoice w-5 text-center"></i> Quotations
+          </a>
+          <a href="admin-categories.html" class="sidebar-link active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition">
+            <i class="fa-solid fa-tags w-5 text-center"></i> Categories
+          </a>
+        </nav>
+
+        <div class="px-4 py-4 border-t border-slate-800">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-brand-orange flex items-center justify-center text-sm font-bold" id="admin-avatar">A</div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold truncate" id="admin-name">Admin</p>
+              <p class="text-xs text-slate-500 truncate" id="admin-email">—</p>
+            </div>
+            <button id="logout-btn" class="text-slate-500 hover:text-red-400 transition">
+              <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="flex-1 lg:ml-64">
+
+      <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+        <div class="flex items-center justify-between px-4 sm:px-6 h-14">
+          <div class="flex items-center gap-3">
+            <button id="sidebar-toggle" class="lg:hidden text-slate-600 text-xl">
+              <i class="fa-solid fa-bars"></i>
+            </button>
+            <h1 class="text-base font-bold text-slate-900">Categories</h1>
+          </div>
+          <button id="open-add-btn"
+                  class="bg-brand-orange hover:bg-brand-dark text-white text-sm font-bold px-4 py-2 rounded-lg transition flex items-center gap-2">
+            <i class="fa-solid fa-plus text-xs"></i>
+            <span class="hidden sm:inline">Add Category</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="p-4 sm:p-6 lg:p-8">
+
+        <div class="bg-white rounded-xl border border-slate-100 shadow-sm p-4 mb-5">
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+            <input id="search-input" type="search" placeholder="Search categories..."
+                   class="w-full border border-slate-200 rounded-lg pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange">
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
+          <div id="categories-container">
+            <div class="p-4 space-y-3">
+              <div class="h-14 skeleton rounded-lg"></div>
+              <div class="h-14 skeleton rounded-lg"></div>
+              <div class="h-14 skeleton rounded-lg"></div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ADD / EDIT MODAL -->
+  <div id="modal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/40" id="modal-backdrop"></div>
+    <div class="absolute inset-x-0 bottom-0 sm:inset-0 sm:flex sm:items-center sm:justify-center p-0 sm:p-4">
+      <div class="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md max-h-[90vh] overflow-y-auto shadow-xl">
+        <div class="sticky top-0 bg-white border-b border-slate-100 px-5 py-4 flex items-center justify-between">
+          <h2 class="font-bold text-slate-900" id="modal-title">Add Category</h2>
+          <button id="close-modal" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <form id="category-form" class="p-5 space-y-4">
+          <input type="hidden" id="edit-id">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">Category Name *</label>
+            <input id="name" type="text" required placeholder="e.g. Electric Bikes"
+                   class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">Icon (Font Awesome class)</label>
+            <input id="icon" type="text" placeholder="e.g. fa-bicycle"
+                   class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange">
+            <p class="text-[11px] text-slate-400 mt-1">Optional. Example: fa-car, fa-motorcycle, fa-battery-full</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">Description</label>
+            <textarea id="description" rows="2" placeholder="Short description..."
+                      class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange resize-none"></textarea>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1.5">Sort Order</label>
+              <input id="sort_order" type="number" value="0"
+                     class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange">
+            </div>
+            <div class="flex items-end pb-1">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="is_active" checked class="w-4 h-4 rounded text-brand-orange">
+                <span class="text-sm font-medium">Active</span>
+              </label>
+            </div>
+          </div>
+          <button type="submit" class="w-full bg-brand-orange hover:bg-brand-dark text-white font-bold py-3 rounded-xl transition">
+            Save Category
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden"></div>
+
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-sm font-medium px-5 py-2.5 rounded-full shadow-lg opacity-0 pointer-events-none transition z-[100]">
+    <span id="toast-msg"></span>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://zgbdhpebmjokbaeflqhj.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_m5osddO3GFnJlQYIvSHS3Q_WqF72WwV";
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let allCategories = [];
+
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    document.getElementById('sidebar-toggle')?.addEventListener('click', () => {
+      sidebar.classList.toggle('-translate-x-full');
+      overlay.classList.toggle('hidden');
+    });
+    overlay?.addEventListener('click', () => {
+      sidebar.classList.add('-translate-x-full');
+      overlay.classList.add('hidden');
+    });
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      document.getElementById('toast-msg').textContent = msg;
+      t.classList.remove('opacity-0', 'pointer-events-none');
+      setTimeout(() => t.classList.add('opacity-0', 'pointer-events-none'), 2500);
+    }
+
+    function renderCategories(list) {
+      const el = document.getElementById('categories-container');
+      if (!list.length) {
+        el.innerHTML = `
+          <div class="py-16 text-center">
+            <i class="fa-solid fa-tags text-3xl text-slate-300 mb-3"></i>
+            <p class="text-slate-500 font-medium">No categories yet</p>
+            <button onclick="openModal()" class="mt-3 text-sm font-semibold text-brand-orange hover:underline">Add your first category →</button>
+          </div>`;
+        return;
+      }
+
+      el.innerHTML = `
+        <div class="divide-y divide-slate-100">
+          ${list.map(c => `
+            <div class="flex items-center gap-3 px-4 py-3.5 hover:bg-slate-50 transition">
+              <div class="w-10 h-10 rounded-xl bg-orange-50 text-brand-orange flex items-center justify-center flex-shrink-0">
+                <i class="fa-solid ${c.icon || 'fa-tag'}"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2">
+                  <p class="font-semibold text-slate-900">${c.name}</p>
+                  ${!c.is_active ? '<span class="text-[10px] font-bold text-slate-400">Inactive</span>' : ''}
+                </div>
+                <p class="text-[11px] text-slate-400">${c.slug} · sort ${c.sort_order ?? 0}</p>
+              </div>
+              <div class="flex items-center gap-1">
+                <button onclick='editCategory(${JSON.stringify(c).replace(/'/g, "&#39;")})'
+                        class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-500">
+                  <i class="fa-solid fa-pen text-xs"></i>
+                </button>
+                <button onclick="deleteCategory('${c.id}', '${(c.name || '').replace(/'/g, "\\'")}')"
+                        class="w-8 h-8 rounded-lg hover:bg-red-50 flex items-center justify-center text-slate-500 hover:text-red-500">
+                  <i class="fa-solid fa-trash text-xs"></i>
+                </button>
+              </div>
+            </div>
+          `).join('')}
+        </div>`;
+    }
+
+    function applySearch() {
+      const q = (document.getElementById('search-input').value || '').toLowerCase().trim();
+      let list = allCategories;
+      if (q) list = list.filter(c => (c.name || '').toLowerCase().includes(q) || (c.slug || '').toLowerCase().includes(q));
+      renderCategories(list);
+    }
+
+    async function loadCategories() {
+      try {
+        const { data, error } = await supabaseClient
+          .from('categories')
+          .select('*')
+          .order('sort_order')
+          .order('name');
+
+        if (error) throw error;
+        allCategories = data || [];
+        applySearch();
+      } catch (e) {
+        document.getElementById('categories-container').innerHTML =
+          `<div class="py-12 text-center text-red-500 text-sm">Failed to load: ${e.message}</div>`;
+      }
+    }
+
+    const modal = document.getElementById('modal');
+    function openModal(edit = null) {
+      document.getElementById('modal-title').textContent = edit ? 'Edit Category' : 'Add Category';
+      document.getElementById('edit-id').value = edit?.id || '';
+      document.getElementById('name').value = edit?.name || '';
+      document.getElementById('icon').value = edit?.icon || '';
+      document.getElementById('description').value = edit?.description || '';
+      document.getElementById('sort_order').value = edit?.sort_order ?? 0;
+      document.getElementById('is_active').checked = edit ? !!edit.is_active : true;
+      modal.classList.remove('hidden');
+    }
+    function closeModal() { modal.classList.add('hidden'); }
+    window.openModal = openModal;
+    window.editCategory = (c) => openModal(c);
+
+    document.getElementById('open-add-btn').addEventListener('click', () => openModal());
+    document.getElementById('close-modal').addEventListener('click', closeModal);
+    document.getElementById('modal-backdrop').addEventListener('click', closeModal);
+
+    document.getElementById('category-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('edit-id').value;
+      const name = document.getElementById('name').value.trim();
+      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+      const payload = {
+        name,
+        slug,
+        icon: document.getElementById('icon').value.trim() || null,
+        description: document.getElementById('description').value.trim() || null,
+        sort_order: parseInt(document.getElementById('sort_order').value) || 0,
+        is_active: document.getElementById('is_active').checked
+      };
+
+      try {
+        if (id) {
+          const { error } = await supabaseClient.from('categories').update(payload).eq('id', id);
+          if (error) throw error;
+          showToast('Category updated');
+        } else {
+          const { error } = await supabaseClient.from('categories').insert([payload]);
+          if (error) throw error;
+          showToast('Category created');
+        }
+        closeModal();
+        loadCategories();
+      } catch (err) {
+        alert(err.message || 'Failed to save');
+      }
+    });
+
+    window.deleteCategory = async function(id, name) {
+      if (!confirm(`Delete "${name}"?`)) return;
+      try {
+        const { error } = await supabaseClient.from('categories').delete().eq('id', id);
+        if (error) throw error;
+        showToast('Category deleted');
+        loadCategories();
+      } catch (e) {
+        alert(e.message || 'Failed to delete');
+      }
+    };
+
+    document.getElementById('search-input').addEventListener('input', applySearch);
+
+    async function checkAuth() {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabaseClient.from('profiles').select('full_name').eq('id', user.id).single();
+        const name = profile?.full_name || user.email?.split('@')[0] || 'Admin';
+        document.getElementById('admin-name').textContent = name;
+        document.getElementById('admin-email').textContent = user.email || '';
+        document.getElementById('admin-avatar').textContent = name.charAt(0).toUpperCase();
+      }
+    }
+
+    document.getElementById('logout-btn')?.addEventListener('click', async () => {
+      if (!confirm('Logout?')) return;
+      await supabaseClient.auth.signOut();
+      window.location.href = 'admin-login.html';
+    });
+
+    checkAuth();
+    loadCategories();
+  </script>
+</body>
+</html>
