@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Orders – Alibaba</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+    body { font-family: 'Inter', system-ui, sans-serif; background: #F3F4F6; }
+    .text-ali-orange { color: #FF6600; }
+    .bg-ali-orange { background-color: #FF6600; }
+    .border-ali-orange { border-color: #FF6600; }
+    .skeleton {
+      background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+  </style>
+</head>
+<body class="min-h-screen text-xs pb-20 lg:pb-0">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
+    <div class="max-w-3xl mx-auto px-4 h-14 flex items-center gap-3">
+      <a href="index.html" class="w-9 h-9 rounded-full hover:bg-gray-100 flex items-center justify-center">
+        <i data-lucide="arrow-left" class="w-5 h-5 text-gray-600"></i>
+      </a>
+      <div>
+        <h1 class="font-bold text-gray-900 text-sm">My Orders</h1>
+        <p class="text-[10px] text-gray-400">Track and manage your orders</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4 py-5">
+
+    <!-- Status filters -->
+    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-3 mb-2">
+      <button onclick="filterStatus('')" class="status-chip flex-shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold border border-gray-200 bg-white text-gray-700" data-status="">All</button>
+      <button onclick="filterStatus('pending')" class="status-chip flex-shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold border border-gray-200 bg-white text-gray-700" data-status="pending">Pending</button>
+      <button onclick="filterStatus('confirmed')" class="status-chip flex-shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold border border-gray-200 bg-white text-gray-700" data-status="confirmed">Confirmed</button>
+      <button onclick="filterStatus('in_production')" class="status-chip flex-shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold border border-gray-200 bg-white text-gray-700" data-status="in_production">Processing</button>
+      <button onclick="filterStatus('shipped')" class="status-chip flex-shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold border border-gray-200 bg-white text-gray-700" data-status="shipped">Shipped</button>
+      <button onclick="filterStatus('delivered')" class="status-chip flex-shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold border border-gray-200 bg-white text-gray-700" data-status="delivered">Delivered</button>
+    </div>
+
+    <!-- Lookup by order number -->
+    <div class="bg-white rounded-xl border border-gray-100 p-3 mb-4 shadow-sm">
+      <p class="text-[10px] text-gray-500 mb-2">Find order by number or phone</p>
+      <div class="flex gap-2">
+        <input id="lookup-input" type="text" placeholder="Order number or phone..."
+               class="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-ali-orange" />
+        <button id="lookup-btn" class="bg-ali-orange text-white font-bold text-xs px-4 py-2 rounded-lg hover:bg-orange-600 transition">
+          Find
+        </button>
+      </div>
+    </div>
+
+    <!-- Orders list -->
+    <div id="orders-list" class="space-y-3">
+      <div class="h-28 skeleton rounded-2xl"></div>
+      <div class="h-28 skeleton rounded-2xl"></div>
+    </div>
+
+    <div id="empty" class="hidden py-16 text-center">
+      <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+        <i data-lucide="clipboard-list" class="w-7 h-7 text-gray-300"></i>
+      </div>
+      <p class="text-gray-500 font-medium">No orders found</p>
+      <p class="text-gray-400 text-[11px] mt-1 mb-4">Place an order or search by order number / phone</p>
+      <a href="shop.html" class="inline-block bg-ali-orange text-white font-bold text-xs px-5 py-2.5 rounded-xl hover:bg-orange-600 transition">
+        Browse Products
+      </a>
+    </div>
+  </main>
+
+  <!-- Mobile bottom nav -->
+  <nav class="lg:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 py-2.5 px-6 flex justify-between items-center z-50">
+    <a href="index.html" class="flex flex-col items-center gap-0.5 text-gray-500">
+      <i data-lucide="home" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold">Home</span>
+    </a>
+    <a href="shop.html" class="flex flex-col items-center gap-0.5 text-gray-500">
+      <i data-lucide="layout-grid" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold">Categories</span>
+    </a>
+    <a href="cart.html" class="flex flex-col items-center gap-0.5 text-gray-500">
+      <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold">Cart</span>
+    </a>
+    <a href="orders.html" class="flex flex-col items-center gap-0.5 text-ali-orange">
+      <i data-lucide="clipboard-list" class="w-5 h-5"></i>
+      <span class="text-[10px] font-bold">Orders</span>
+    </a>
+    <a href="account.html" class="flex flex-col items-center gap-0.5 text-gray-500">
+      <i data-lucide="user" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold">Account</span>
+    </a>
+  </nav>
+
+  <script>
+    const SUPABASE_URL = "https://zgbdhpebmjokbaeflqhj.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_m5osddO3GFnJlQYIvSHS3Q_WqF72WwV";
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let allOrders = [];
+    let currentStatus = '';
+
+    function statusBadge(status) {
+      const map = {
+        pending: 'bg-amber-100 text-amber-700',
+        confirmed: 'bg-blue-100 text-blue-700',
+        in_production: 'bg-violet-100 text-violet-700',
+        shipped: 'bg-cyan-100 text-cyan-700',
+        delivered: 'bg-emerald-100 text-emerald-700',
+        cancelled: 'bg-red-100 text-red-700'
+      };
+      const labels = {
+        pending: 'Pending Payment',
+        confirmed: 'Confirmed',
+        in_production: 'Processing',
+        shipped: 'Shipped / Pickup',
+        delivered: 'Delivered',
+        cancelled: 'Cancelled'
+      };
+      return `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${map[status] || 'bg-gray-100 text-gray-600'}">${labels[status] || status}</span>`;
+    }
+
+    function formatMoney(amount, currency = 'USD') {
+      if (amount == null) return '—';
+      const s = currency === 'USD' ? '$' : currency + ' ';
+      return s + Number(amount).toLocaleString();
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '—';
+      return new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function getCustomerName(o) {
+      const a = o.shipping_address || {};
+      return a.full_name || a.name || 'Customer';
+    }
+
+    function getPhone(o) {
+      const a = o.shipping_address || {};
+      return a.phone || '';
+    }
+
+    function orderCard(o) {
+      const img = o.products?.main_image_url || (o.products?.images && o.products.images[0]) || 'https://placehold.co/80x80?text=No';
+      return `
+        <a href="my-order.html?id=${o.id}" class="block bg-white rounded-2xl border border-gray-100 p-4 shadow-sm hover:shadow-md transition">
+          <div class="flex items-start justify-between gap-2 mb-3">
+            <div>
+              <p class="font-bold text-gray-900 text-sm">${o.order_number || o.id.slice(0, 8)}</p>
+              <p class="text-[10px] text-gray-400">${formatDate(o.created_at)}</p>
+            </div>
+            ${statusBadge(o.status)}
+          </div>
+          <div class="flex gap-3">
+            <img src="${img}" class="w-14 h-14 rounded-xl object-cover bg-gray-50 flex-shrink-0" onerror="this.src='https://placehold.co/80x80?text=No'">
+            <div class="flex-1 min-w-0">
+              <p class="font-semibold text-gray-900 text-xs line-clamp-2">${o.products?.title || 'Product'}</p>
+              <p class="text-[10px] text-gray-500 mt-0.5">Qty: ${o.quantity || 1}</p>
+              <p class="font-bold text-ali-orange text-sm mt-1">${formatMoney(o.total_amount, o.currency)}</p>
+            </div>
+          </div>
+          <div class="mt-3 pt-2 border-t border-gray-50 flex items-center justify-between">
+            <span class="text-[10px] text-gray-400">${getCustomerName(o)}</span>
+            <span class="text-[11px] font-bold text-ali-orange flex items-center gap-1">View order <i data-lucide="arrow-right" class="w-3 h-3"></i></span>
+          </div>
+        </a>`;
+    }
+
+    function render(list) {
+      const el = document.getElementById('orders-list');
+      const empty = document.getElementById('empty');
+      if (!list.length) {
+        el.innerHTML = '';
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+      el.innerHTML = list.map(orderCard).join('');
+      lucide.createIcons();
+    }
+
+    window.filterStatus = function(status) {
+      currentStatus = status;
+      document.querySelectorAll('.status-chip').forEach(btn => {
+        const active = btn.dataset.status === status;
+        btn.classList.toggle('bg-ali-orange', active);
+        btn.classList.toggle('text-white', active);
+        btn.classList.toggle('border-ali-orange', active);
+        btn.classList.toggle('bg-white', !active);
+        btn.classList.toggle('text-gray-700', !active);
+      });
+      const filtered = status ? allOrders.filter(o => o.status === status) : allOrders;
+      render(filtered);
+    };
+
+    async function loadRecent() {
+      // Show most recent orders (public read via RLS or limited)
+      try {
+        const { data, error } = await supabaseClient
+          .from('orders')
+          .select(`
+            id, order_number, quantity, total_amount, currency, status, shipping_address, created_at,
+            products (title, main_image_url, images)
+          `)
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        if (error) throw error;
+        allOrders = data || [];
+        // Keep last searched in session if any
+        const saved = sessionStorage.getItem('ali_order_lookup');
+        if (saved) {
+          document.getElementById('lookup-input').value = saved;
+          doLookup();
+        } else {
+          render(allOrders);
+        }
+      } catch (e) {
+        console.error(e);
+        document.getElementById('orders-list').innerHTML =
+          `<div class="py-10 text-center text-gray-400 text-sm">Use search above to find your order by number or phone</div>`;
+        document.getElementById('empty').classList.add('hidden');
+      }
+    }
+
+    async function doLookup() {
+      const q = document.getElementById('lookup-input').value.trim();
+      if (!q) {
+        render(currentStatus ? allOrders.filter(o => o.status === currentStatus) : allOrders);
+        return;
+      }
+      sessionStorage.setItem('ali_order_lookup', q);
+
+      const qLower = q.toLowerCase();
+      // Filter from loaded list first
+      let found = allOrders.filter(o => {
+        const num = (o.order_number || '').toLowerCase();
+        const phone = getPhone(o).toLowerCase();
+        const name = getCustomerName(o).toLowerCase();
+        return num.includes(qLower) || phone.includes(qLower) || name.includes(qLower) || o.id.toLowerCase().includes(qLower);
+      });
+
+      // If nothing in cache, query by order_number
+      if (!found.length) {
+        const { data } = await supabaseClient
+          .from('orders')
+          .select(`
+            id, order_number, quantity, total_amount, currency, status, shipping_address, created_at,
+            products (title, main_image_url, images)
+          `)
+          .or(`order_number.ilike.%${q}%,id.eq.${q}`)
+          .order('created_at', { ascending: false })
+          .limit(20);
+        found = data || [];
+      }
+
+      if (currentStatus) found = found.filter(o => o.status === currentStatus);
+      render(found);
+    }
+
+    document.getElementById('lookup-btn').addEventListener('click', doLookup);
+    document.getElementById('lookup-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') doLookup();
+    });
+
+    // Highlight "All" by default
+    filterStatus('');
+    loadRecent();
+    lucide.createIcons();
+  </script>
+</body>
+</html>
