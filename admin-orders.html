@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orders – EVSource Admin</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              orange: '#FF6A00',
+              dark: '#E55A00',
+              navy: '#0F172A'
+            }
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .sidebar-link.active { background: rgba(255, 106, 0, 0.12); color: #FF6A00; }
+    .skeleton {
+      background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+  </style>
+</head>
+
+<body class="bg-slate-100 text-slate-800 antialiased">
+
+  <div class="flex min-h-screen">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 text-white transform -translate-x-full lg:translate-x-0 transition-transform duration-200">
+      <div class="flex flex-col h-full">
+        <div class="px-6 py-5 border-b border-slate-800">
+          <a href="admin-dashboard.html" class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-brand-orange flex items-center justify-center text-white font-black text-sm">EV</div>
+            <div>
+              <p class="font-bold text-white leading-none">EVSource</p>
+              <p class="text-[10px] text-slate-500">Admin Panel</p>
+            </div>
+          </a>
+        </div>
+
+        <nav class="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
+          <p class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Main</p>
+          <a href="admin-dashboard.html" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa-solid fa-chart-pie w-5 text-center"></i> Dashboard
+          </a>
+          <a href="admin-products.html" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa-solid fa-box w-5 text-center"></i> Products
+          </a>
+          <a href="admin-suppliers.html" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa-solid fa-building w-5 text-center"></i> Suppliers
+          </a>
+          <a href="admin-orders.html" class="sidebar-link active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition">
+            <i class="fa-solid fa-cart-shopping w-5 text-center"></i> Orders
+          </a>
+          <a href="admin-quotations.html" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa-solid fa-file-invoice w-5 text-center"></i> Quotations
+          </a>
+          <a href="admin-categories.html" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa-solid fa-tags w-5 text-center"></i> Categories
+          </a>
+        </nav>
+
+        <div class="px-4 py-4 border-t border-slate-800">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-brand-orange flex items-center justify-center text-sm font-bold" id="admin-avatar">A</div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold truncate" id="admin-name">Admin</p>
+              <p class="text-xs text-slate-500 truncate" id="admin-email">—</p>
+            </div>
+            <button id="logout-btn" class="text-slate-500 hover:text-red-400 transition">
+              <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="flex-1 lg:ml-64">
+
+      <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+        <div class="flex items-center justify-between px-4 sm:px-6 h-14">
+          <div class="flex items-center gap-3">
+            <button id="sidebar-toggle" class="lg:hidden text-slate-600 text-xl">
+              <i class="fa-solid fa-bars"></i>
+            </button>
+            <h1 class="text-base font-bold text-slate-900">Orders</h1>
+          </div>
+        </div>
+      </header>
+
+      <main class="p-4 sm:p-6 lg:p-8">
+
+        <!-- Status Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
+          <button onclick="filterStatus('')" class="status-btn bg-white rounded-xl border border-slate-100 p-3 text-left hover:border-brand-orange transition" data-status="">
+            <p class="text-lg font-black text-slate-900" id="count-all">0</p>
+            <p class="text-[11px] text-slate-500">All</p>
+          </button>
+          <button onclick="filterStatus('pending')" class="status-btn bg-white rounded-xl border border-slate-100 p-3 text-left hover:border-amber-400 transition" data-status="pending">
+            <p class="text-lg font-black text-amber-600" id="count-pending">0</p>
+            <p class="text-[11px] text-slate-500">Pending</p>
+          </button>
+          <button onclick="filterStatus('confirmed')" class="status-btn bg-white rounded-xl border border-slate-100 p-3 text-left hover:border-blue-400 transition" data-status="confirmed">
+            <p class="text-lg font-black text-blue-600" id="count-confirmed">0</p>
+            <p class="text-[11px] text-slate-500">Confirmed</p>
+          </button>
+          <button onclick="filterStatus('in_production')" class="status-btn bg-white rounded-xl border border-slate-100 p-3 text-left hover:border-violet-400 transition" data-status="in_production">
+            <p class="text-lg font-black text-violet-600" id="count-production">0</p>
+            <p class="text-[11px] text-slate-500">Processing</p>
+          </button>
+          <button onclick="filterStatus('shipped')" class="status-btn bg-white rounded-xl border border-slate-100 p-3 text-left hover:border-cyan-400 transition" data-status="shipped">
+            <p class="text-lg font-black text-cyan-600" id="count-shipped">0</p>
+            <p class="text-[11px] text-slate-500">Shipped / Pickup</p>
+          </button>
+          <button onclick="filterStatus('delivered')" class="status-btn bg-white rounded-xl border border-slate-100 p-3 text-left hover:border-emerald-400 transition" data-status="delivered">
+            <p class="text-lg font-black text-emerald-600" id="count-delivered">0</p>
+            <p class="text-[11px] text-slate-500">Delivered</p>
+          </button>
+        </div>
+
+        <!-- Search -->
+        <div class="bg-white rounded-xl border border-slate-100 shadow-sm p-4 mb-5">
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+            <input id="search-input" type="search" placeholder="Search order number, customer name, phone..."
+                   class="w-full border border-slate-200 rounded-lg pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange">
+          </div>
+        </div>
+
+        <!-- Orders List -->
+        <div class="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
+          <div id="orders-container">
+            <div class="p-4 space-y-3">
+              <div class="h-16 skeleton rounded-lg"></div>
+              <div class="h-16 skeleton rounded-lg"></div>
+              <div class="h-16 skeleton rounded-lg"></div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden"></div>
+
+  <script>
+    const SUPABASE_URL = "https://zgbdhpebmjokbaeflqhj.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_m5osddO3GFnJlQYIvSHS3Q_WqF72WwV";
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let allOrders = [];
+    let currentStatus = '';
+
+    // Sidebar
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    document.getElementById('sidebar-toggle')?.addEventListener('click', () => {
+      sidebar.classList.toggle('-translate-x-full');
+      overlay.classList.toggle('hidden');
+    });
+    overlay?.addEventListener('click', () => {
+      sidebar.classList.add('-translate-x-full');
+      overlay.classList.add('hidden');
+    });
+
+    function statusBadge(status) {
+      const map = {
+        pending: 'bg-amber-100 text-amber-700',
+        confirmed: 'bg-blue-100 text-blue-700',
+        in_production: 'bg-violet-100 text-violet-700',
+        shipped: 'bg-cyan-100 text-cyan-700',
+        delivered: 'bg-emerald-100 text-emerald-700',
+        cancelled: 'bg-red-100 text-red-700'
+      };
+      const labels = {
+        pending: 'Pending Payment',
+        confirmed: 'Confirmed',
+        in_production: 'Processing',
+        shipped: 'Shipped / Pickup',
+        delivered: 'Delivered',
+        cancelled: 'Cancelled'
+      };
+      return `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${map[status] || 'bg-slate-100 text-slate-600'}">${labels[status] || status}</span>`;
+    }
+
+    function formatMoney(amount, currency = 'USD') {
+      if (amount == null) return '—';
+      const s = currency === 'USD' ? '$' : currency + ' ';
+      return s + Number(amount).toLocaleString();
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) +
+             ' · ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function getCustomerName(order) {
+      const addr = order.shipping_address || {};
+      return addr.full_name || addr.name || order.profiles?.full_name || 'Customer';
+    }
+
+    function getCustomerPhone(order) {
+      const addr = order.shipping_address || {};
+      return addr.phone || order.profiles?.phone || '—';
+    }
+
+    function renderOrders(orders) {
+      const el = document.getElementById('orders-container');
+
+      if (!orders.length) {
+        el.innerHTML = `
+          <div class="py-16 text-center">
+            <i class="fa-solid fa-cart-shopping text-3xl text-slate-300 mb-3"></i>
+            <p class="text-slate-500 font-medium">No orders found</p>
+            <p class="text-sm text-slate-400 mt-1">Orders will appear here when customers place them</p>
+          </div>`;
+        return;
+      }
+
+      el.innerHTML = `
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-slate-50 border-b border-slate-100">
+              <tr class="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <th class="px-4 py-3">Order</th>
+                <th class="px-4 py-3 hidden md:table-cell">Customer</th>
+                <th class="px-4 py-3 hidden sm:table-cell">Amount</th>
+                <th class="px-4 py-3">Status</th>
+                <th class="px-4 py-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              ${orders.map(o => `
+                <tr class="hover:bg-slate-50 transition">
+                  <td class="px-4 py-3">
+                    <p class="font-semibold text-slate-900">${o.order_number || o.id.slice(0, 8)}</p>
+                    <p class="text-[11px] text-slate-400">${formatDate(o.created_at)}</p>
+                  </td>
+                  <td class="px-4 py-3 hidden md:table-cell">
+                    <p class="font-medium text-slate-800">${getCustomerName(o)}</p>
+                    <p class="text-[11px] text-slate-400">${getCustomerPhone(o)}</p>
+                  </td>
+                  <td class="px-4 py-3 hidden sm:table-cell font-semibold text-slate-800">
+                    ${formatMoney(o.total_amount, o.currency)}
+                  </td>
+                  <td class="px-4 py-3">${statusBadge(o.status)}</td>
+                  <td class="px-4 py-3 text-right">
+                    <a href="admin-order-details.html?id=${o.id}"
+                       class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-orange hover:underline">
+                      Open <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </a>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>`;
+    }
+
+    function updateCounts() {
+      document.getElementById('count-all').textContent = allOrders.length;
+      document.getElementById('count-pending').textContent = allOrders.filter(o => o.status === 'pending').length;
+      document.getElementById('count-confirmed').textContent = allOrders.filter(o => o.status === 'confirmed').length;
+      document.getElementById('count-production').textContent = allOrders.filter(o => o.status === 'in_production').length;
+      document.getElementById('count-shipped').textContent = allOrders.filter(o => o.status === 'shipped').length;
+      document.getElementById('count-delivered').textContent = allOrders.filter(o => o.status === 'delivered').length;
+    }
+
+    window.filterStatus = function(status) {
+      currentStatus = status;
+      document.querySelectorAll('.status-btn').forEach(btn => {
+        btn.classList.toggle('ring-2', btn.dataset.status === status);
+        btn.classList.toggle('ring-brand-orange', btn.dataset.status === status);
+      });
+      applyFilters();
+    };
+
+    function applyFilters() {
+      const q = (document.getElementById('search-input').value || '').toLowerCase().trim();
+      let filtered = allOrders;
+
+      if (currentStatus) filtered = filtered.filter(o => o.status === currentStatus);
+
+      if (q) {
+        filtered = filtered.filter(o => {
+          const name = getCustomerName(o).toLowerCase();
+          const phone = getCustomerPhone(o).toLowerCase();
+          const num = (o.order_number || '').toLowerCase();
+          return name.includes(q) || phone.includes(q) || num.includes(q) || o.id.toLowerCase().includes(q);
+        });
+      }
+
+      renderOrders(filtered);
+    }
+
+    async function loadOrders() {
+      try {
+        const { data, error } = await supabaseClient
+          .from('orders')
+          .select(`
+            id, order_number, quantity, unit_price, total_amount, currency, status, notes,
+            shipping_address, created_at, updated_at,
+            profiles:buyer_id (full_name, phone, email),
+            products (title, main_image_url),
+            suppliers (company_name)
+          `)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        allOrders = data || [];
+        updateCounts();
+        applyFilters();
+      } catch (e) {
+        console.error(e);
+        document.getElementById('orders-container').innerHTML = `
+          <div class="py-12 text-center text-red-500 text-sm">Failed to load orders: ${e.message}</div>`;
+      }
+    }
+
+    document.getElementById('search-input').addEventListener('input', applyFilters);
+
+    async function checkAuth() {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabaseClient.from('profiles').select('full_name').eq('id', user.id).single();
+        const name = profile?.full_name || user.email?.split('@')[0] || 'Admin';
+        document.getElementById('admin-name').textContent = name;
+        document.getElementById('admin-email').textContent = user.email || '';
+        document.getElementById('admin-avatar').textContent = name.charAt(0).toUpperCase();
+      }
+    }
+
+    document.getElementById('logout-btn')?.addEventListener('click', async () => {
+      if (!confirm('Logout?')) return;
+      await supabaseClient.auth.signOut();
+      window.location.href = 'admin-login.html';
+    });
+
+    checkAuth();
+    loadOrders();
+  </script>
+</body>
+</html>
