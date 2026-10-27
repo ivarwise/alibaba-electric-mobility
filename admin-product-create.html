@@ -144,10 +144,16 @@
               <div class="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label class="block text-sm font-medium text-slate-700 mb-1.5">Supplier *</label>
-                  <select id="supplier_id" required
-                          class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange bg-white">
-                    <option value="">Select supplier</option>
-                  </select>
+                  <div class="flex gap-2">
+                    <select id="supplier_id" required
+                            class="flex-1 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange bg-white">
+                      <option value="">Select supplier</option>
+                    </select>
+                    <button type="button" id="add-supplier-btn"
+                            class="px-3 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition whitespace-nowrap">
+                      + New
+                    </button>
+                  </div>
                 </div>
                 <div>
                   <label class="block text-sm font-medium text-slate-700 mb-1.5">Category *</label>
@@ -157,14 +163,38 @@
                       <option value="">Select category</option>
                     </select>
                     <button type="button" id="add-category-btn"
-                            class="px-3 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition">
+                            class="px-3 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition whitespace-nowrap">
                       + New
                     </button>
                   </div>
                 </div>
               </div>
 
-              <!-- New Category -->
+              <!-- New Supplier box -->
+              <div id="new-supplier-box" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+                <p class="text-sm font-semibold text-slate-800">Create New Supplier</p>
+                <div class="grid sm:grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Company Name *</label>
+                    <input id="new-supplier-name" type="text" placeholder="e.g. BYD Electric Co."
+                           class="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Country</label>
+                    <input id="new-supplier-country" type="text" placeholder="e.g. China"
+                           class="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20">
+                  </div>
+                </div>
+                <div class="flex gap-2">
+                  <button type="button" id="save-supplier-btn"
+                          class="bg-brand-orange hover:bg-brand-dark text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition">
+                    Save Supplier
+                  </button>
+                  <button type="button" id="cancel-supplier-btn" class="text-slate-500 text-sm font-medium px-2">Cancel</button>
+                </div>
+              </div>
+
+              <!-- New Category box -->
               <div id="new-category-box" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-4">
                 <p class="text-sm font-semibold text-slate-800 mb-2">Create New Category</p>
                 <div class="flex gap-2">
@@ -343,14 +373,9 @@
       overlay.classList.add('hidden');
     });
 
-    // Auth check (basic)
     async function checkAuth() {
       const { data: { user } } = await supabaseClient.auth.getUser();
-      if (!user) {
-        // Allow for now – remove this comment and redirect if you want strict auth
-        // window.location.href = 'admin-login.html';
-        return;
-      }
+      if (!user) return;
       const { data: profile } = await supabaseClient
         .from('profiles')
         .select('full_name, role, email')
@@ -363,7 +388,7 @@
       document.getElementById('admin-avatar').textContent = name.charAt(0).toUpperCase();
     }
 
-    // Load suppliers
+    // Load suppliers (FIXED value="${s.id}")
     async function loadSuppliers() {
       const select = document.getElementById('supplier_id');
       const { data } = await supabaseClient
@@ -378,7 +403,7 @@
       });
     }
 
-    // Load categories
+    // Load categories (FIXED value="${c.id}")
     async function loadCategories() {
       const select = document.getElementById('category_id');
       const { data } = await supabaseClient
@@ -393,9 +418,51 @@
       });
     }
 
-    // New category
+    // ===== + New Supplier =====
+    document.getElementById('add-supplier-btn').addEventListener('click', () => {
+      document.getElementById('new-supplier-box').classList.remove('hidden');
+      document.getElementById('new-category-box').classList.add('hidden');
+      document.getElementById('new-supplier-name').focus();
+    });
+    document.getElementById('cancel-supplier-btn').addEventListener('click', () => {
+      document.getElementById('new-supplier-box').classList.add('hidden');
+      document.getElementById('new-supplier-name').value = '';
+      document.getElementById('new-supplier-country').value = '';
+    });
+    document.getElementById('save-supplier-btn').addEventListener('click', async () => {
+      const name = document.getElementById('new-supplier-name').value.trim();
+      const country = document.getElementById('new-supplier-country').value.trim();
+      if (!name) return alert('Enter company name');
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('suppliers')
+          .insert([{
+            company_name: name,
+            country: country || null,
+            is_active: true,
+            is_verified: true,
+            badge: 'verified'
+          }])
+          .select()
+          .single();
+        if (error) throw error;
+
+        await loadSuppliers();
+        document.getElementById('supplier_id').value = data.id;
+        document.getElementById('new-supplier-box').classList.add('hidden');
+        document.getElementById('new-supplier-name').value = '';
+        document.getElementById('new-supplier-country').value = '';
+        alert('Supplier created!');
+      } catch (err) {
+        alert(err.message || 'Failed to create supplier');
+      }
+    });
+
+    // ===== + New Category =====
     document.getElementById('add-category-btn').addEventListener('click', () => {
       document.getElementById('new-category-box').classList.remove('hidden');
+      document.getElementById('new-supplier-box').classList.add('hidden');
       document.getElementById('new-category-name').focus();
     });
     document.getElementById('cancel-category-btn').addEventListener('click', () => {
@@ -547,10 +614,7 @@
       submitBtn.disabled = true;
 
       try {
-        // 1. Upload images
         const { main, all } = await uploadAllImages();
-
-        // 2. Insert product
         const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
 
         const { data: product, error: productError } = await supabaseClient
@@ -582,7 +646,6 @@
 
         if (productError) throw productError;
 
-        // 3. Also insert into product_images table (optional but good)
         if (all.length > 0) {
           const rows = all.map((url, i) => ({
             product_id: product.id,
@@ -614,7 +677,6 @@
       window.location.href = 'admin-login.html';
     });
 
-    // Init
     checkAuth();
     loadSuppliers();
     loadCategories();
