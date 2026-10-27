@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Help Center – Alibaba</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+    body { font-family: 'Inter', system-ui, sans-serif; background: #F3F4F6; }
+    .text-ali-orange { color: #FF6600; }
+    .bg-ali-orange { background-color: #FF6600; }
+    .border-ali-orange { border-color: #FF6600; }
+    .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+    .faq-item.open .faq-answer { max-height: 500px; }
+    .faq-item.open .faq-chevron { transform: rotate(180deg); }
+  </style>
+</head>
+<body class="min-h-screen text-sm pb-20 lg:pb-0">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
+    <div class="max-w-4xl mx-auto px-4 h-14 flex items-center gap-3">
+      <a href="index.html" class="w-9 h-9 rounded-full hover:bg-gray-100 flex items-center justify-center">
+        <i data-lucide="arrow-left" class="w-5 h-5 text-gray-600"></i>
+      </a>
+      <div>
+        <h1 class="font-bold text-gray-900 text-sm">Help Center</h1>
+        <p class="text-[10px] text-gray-400">Buyer support</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-4 py-6">
+
+    <!-- Hero + Search -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6 mb-6 text-center">
+      <h2 class="text-lg sm:text-xl font-black text-gray-900 mb-1">How can we help you?</h2>
+      <p class="text-xs text-gray-500 mb-4">Search for answers or browse categories below</p>
+      <div class="relative max-w-xl mx-auto">
+        <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        <input id="help-search" type="search" placeholder="Search help articles (e.g. payment, order, quote)..."
+               class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-ali-orange" />
+      </div>
+    </div>
+
+    <!-- Categories (Alibaba-style) -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8" id="categories">
+      <button onclick="scrollToSection('getting-started')" class="bg-white rounded-xl border border-gray-100 p-4 text-left hover:border-ali-orange hover:shadow-sm transition">
+        <div class="w-9 h-9 rounded-lg bg-orange-50 text-ali-orange flex items-center justify-center mb-2"><i data-lucide="user-plus" class="w-4 h-4"></i></div>
+        <p class="font-bold text-gray-900 text-xs">Account</p>
+        <p class="text-[10px] text-gray-400 mt-0.5">Register, login, profile</p>
+      </button>
+      <button onclick="scrollToSection('sourcing')" class="bg-white rounded-xl border border-gray-100 p-4 text-left hover:border-ali-orange hover:shadow-sm transition">
+        <div class="w-9 h-9 rounded-lg bg-orange-50 text-ali-orange flex items-center justify-center mb-2"><i data-lucide="search" class="w-4 h-4"></i></div>
+        <p class="font-bold text-gray-900 text-xs">Sourcing</p>
+        <p class="text-[10px] text-gray-400 mt-0.5">Find products & suppliers</p>
+      </button>
+      <button onclick="scrollToSection('quotation')" class="bg-white rounded-xl border border-gray-100 p-4 text-left hover:border-ali-orange hover:shadow-sm transition">
+        <div class="w-9 h-9 rounded-lg bg-orange-50 text-ali-orange flex items-center justify-center mb-2"><i data-lucide="file-text" class="w-4 h-4"></i></div>
+        <p class="font-bold text-gray-900 text-xs">Quotation (RFQ)</p>
+        <p class="text-[10px] text-gray-400 mt-0.5">Request & receive quotes</p>
+      </button>
+      <button onclick="scrollToSection('orders')" class="bg-white rounded-xl border border-gray-100 p-4 text-left hover:border-ali-orange hover:shadow-sm transition">
+        <div class="w-9 h-9 rounded-lg bg-orange-50 text-ali-orange flex items-center justify-center mb-2"><i data-lucide="shopping-bag" class="w-4 h-4"></i></div>
+        <p class="font-bold text-gray-900 text-xs">Place Order</p>
+        <p class="text-[10px] text-gray-400 mt-0.5">How to order products</p>
+      </button>
+      <button onclick="scrollToSection('payment')" class="bg-white rounded-xl border border-gray-100 p-4 text-left hover:border-ali-orange hover:shadow-sm transition">
+        <div class="w-9 h-9 rounded-lg bg-orange-50 text-ali-orange flex items-center justify-center mb-2"><i data-lucide="credit-card" class="w-4 h-4"></i></div>
+        <p class="font-bold text-gray-900 text-xs">Payment</p>
+        <p class="text-[10px] text-gray-400 mt-0.5">Bank transfer & receipts</p>
+      </button>
+      <button onclick="scrollToSection('tracking')" class="bg-white rounded-xl border border-gray-100 p-4 text-left hover:border-ali-orange hover:shadow-sm transition">
+        <div class="w-9 h-9 rounded-lg bg-orange-50 text-ali-orange flex items-center justify-center mb-2"><i data-lucide="truck" class="w-4 h-4"></i></div>
+        <p class="font-bold text-gray-900 text-xs">Tracking & Chat</p>
+        <p class="text-[10px] text-gray-400 mt-0.5">Status, messages, files</p>
+      </button>
+    </div>
+
+    <!-- FAQ Sections -->
+    <div id="faq-container" class="space-y-6">
+
+      <!-- Getting Started -->
+      <section id="getting-started" class="faq-section">
+        <h3 class="font-bold text-gray-900 text-sm mb-3 flex items-center gap-2">
+          <i data-lucide="user-plus" class="w-4 h-4 text-ali-orange"></i> Account Management
+        </h3>
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm divide-y divide-gray-50">
+          <div class="faq-item">
+            <button class="faq-q w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-gray-50">
+              <span class="font-semibold text-gray-900 text-xs">How do I create an account?</span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 faq-chevron transition"></i>
+            </button>
+            <div class="faq-answer px-4 text-xs text-gray-600 leading-relaxed">
+              <p class="pb-3">Click <strong>Join Free</strong> (or go to register.html). Enter your full name, email, phone and password. After registration you can sign in and manage orders from My Account.</p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-gray-50">
+              <span class="font-semibold text-gray-900 text-xs">Do I need an account to place an order?</span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 faq-chevron transition"></i>
+            </button>
+            <div class="faq-answer px-4 text-xs text-gray-600 leading-relaxed">
+              <p class="pb-3">No. You can place an order as a guest with your name, phone and address. An account makes it easier to track orders and messages later.</p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-gray-50">
+              <span class="font-semibold text-gray-900 text-xs">I forgot my password. What should I do?</span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 faq-chevron transition"></i>
+            </button>
+            <div class="faq-answer px-4 text-xs text-gray-600 leading-relaxed">
+              <p class="pb-3">On the Sign In page, tap <strong>Forgot password?</strong> and follow the steps to reset via email. If you still need help, contact us through Messages.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sourcing -->
+      <section id="sourcing" class="faq-section">
+        <h3 class="font-bold text-gray-900 text-sm mb-3 flex items-center gap-2">
+          <i data-lucide="search" class="w-4 h-4 text-ali-orange"></i> Sourcing
+        </h3>
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm divide-y divide-gray-50">
+          <div class="faq-item">
+            <button class="faq-q w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-gray-50">
+              <span class="font-semibold text-gray-900 text-xs">How do I find products?</span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 faq-chevron transition"></i>
+            </button>
+            <div class="faq-answer px-4 text-xs text-gray-600 leading-relaxed">
+              <p class="pb-3">Use the search bar on the home page or go to <strong>Shop</strong>. Filter by category (Electric Bikes, Batteries, etc.). Open a product to see price range, MOQ, supplier and details.</p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-gray-50">
+              <span class="font-semibold text-gray-900 text-xs">What is MOQ?</span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 faq-chevron transition"></i>
+            </button>
+            <div class="faq-answer px-4 text-xs text-gray-600 leading-relaxed">
+              <p class="pb-3"><strong>Minimum Order Quantity</strong> — the smallest number of units the supplier will sell. You must order at least the MOQ shown on the product page.</p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-gray-50">
+              <span class="font-semibold text-gray-900 text-xs">What does “Verified Supplier” mean?</span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 faq-chevron transition"></i>
+            </button>
+            <div class="faq-answer px-4 text-xs text-gray-600 leading-relaxed">
+              <p class="pb-3">Verified (and Gold) suppliers have been reviewed on our platform. Prefer these when sourcing for safer trade.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Quotation -->
+      <section id="quotation" class="faq-section">
+        <h3 class="font-bold text-gray-900 text-sm mb-3 flex items-center gap-2">
+          <i data-lucide="file-text" class="w-4 h-4 text-ali-orange"></i> Request for Quotation (RFQ)
+        </h3>
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm divide-y divide-gray-50">
+          <div class="faq-item">
+            <button class="faq-q w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-gray-50">
+              <span class="font-semibold text-gray-900 text-xs">How do I request a quote?</span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 faq-chevron transition"></i>
+            </button>
+            <div class="faq-answer px-4 text-xs text-gray-600 leading-relaxed">
+              <p class="pb-3">On a product page click <strong>Get Quote</strong>, or go to Request Quotation. Fill quantity, target price and message. The supplier will reply with a quote. No payment is required to request a quote.</p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-gray-50">
+              <span class="font-semibold text-gray-900 text-xs">How long does a quote take?</span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 faq-chevron transition"></i>
+            </button>
+            <div class="faq-answer px-4 text-xs text-gray-600 leading-relaxed">
+              <p class="pb-3">Usually within 1–2 business days. You will see the reply in Messages or we may contact you by phone/email using the details you provided.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Orders -->
+      <section id="orders" class="faq-section">
+        <h3 class="font-bold text-gray-900 text-sm mb-3 flex items-center gap-2">
+          <i data-lucide="shopping-bag" class="w-4 h-4 text-ali-orange"></i> Place Order
+        </h3>
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm divide-y divide-gray-50">
+          <div class="faq-item">
+            <button class="faq-q w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-gray-50">
+              <span class="font-semibold text-gray-900 text-xs">How do I place an order?</span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 faq-chevron transition"></i>
+            </button>
+            <div class="faq-answer px-4 text-xs text-gray-600 leading-relaxed">
+              <p class="pb-3">1. Open a product → <strong>Place Order</strong><br>
+              2. Enter name, phone, address and quantity<br>
+              3. Submit → you get an order number<br>
+              4. Wait for payment instructions in the order chat</p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-gray-50">
+              <span class="font-semibold text-gray-900 text-xs">Where do I see my orders?</span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 faq-chevron transition"></i>
+            </button>
+            <div class="faq-answer px-4 text-xs text-gray-600 leading-relaxed">
+              <p class="pb-3">Go to <strong>Orders</strong> (bottom menu or Account). Search by order number or the phone number you used when ordering.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Payment -->
+      <section id="payment" class="faq-section">
+        <h3 class="font-bold text-gray-900 text-sm mb-3 flex items-center gap-2">
+          <i data-lucide="credit-card" class="w-4 h-4 text-ali-orange"></i> Order Payment
+        </h3>
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm divide-y divide-gray-50">
+          <div class="faq-item">
+            <button class="faq-q w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-gray-50">
+              <span class="font-semibold text-gray-900 text-xs">How does payment work?</span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 faq-chevron transition"></i>
+            </button>
+            <div class="faq-answer px-4 text-xs text-gray-600 leading-relaxed">
+              <p class="pb-3">Payment is <strong>manual</strong>. After you place an order, we send bank account details in the order chat. Transfer the amount, then upload your payment receipt (photo or PDF) in the same chat. We confirm and update the order status.</p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-gray-50">
+              <span class="font-semibold text-gray-900 text-xs">How do I upload a payment receipt?</span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 faq-chevron transition"></i>
+            </button>
+            <div class="faq-answer px-4 text-xs text-gray-600 leading-relaxed">
+              <p class="pb-3">Open your order (Orders → open order, or Messages). Use the image/attachment button in the chat to upload a photo or PDF of the receipt.</p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-gray-50">
+              <span class="font-semibold text-gray-900 text-xs">Is online card payment available?</span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 faq-chevron transition"></i>
+            </button>
+            <div class="faq-answer px-4 text-xs text-gray-600 leading-relaxed">
+              <p class="pb-3">Not at the moment. All payments are confirmed manually after bank transfer and receipt upload for security and flexibility.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tracking -->
+      <section id="tracking" class="faq-section">
+        <h3 class="font-bold text-gray-900 text-sm mb-3 flex items-center gap-2">
+          <i data-lucide="truck" class="w-4 h-4 text-ali-orange"></i> Tracking & Messages
+        </h3>
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm divide-y divide-gray-50">
+          <div class="faq-item">
+            <button class="faq-q w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-gray-50">
+              <span class="font-semibold text-gray-900 text-xs">What do the order statuses mean?</span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 faq-chevron transition"></i>
+            </button>
+            <div class="faq-answer px-4 text-xs text-gray-600 leading-relaxed">
+              <p class="pb-3">
+                <strong>Pending</strong> — waiting for payment instructions / payment<br>
+                <strong>Confirmed</strong> — payment received<br>
+                <strong>Processing</strong> — order being prepared<br>
+                <strong>Shipped / Pickup</strong> — ready or on the way<br>
+                <strong>Delivered</strong> — completed
+              </p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-gray-50">
+              <span class="font-semibold text-gray-900 text-xs">How do I chat about my order?</span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 faq-chevron transition"></i>
+            </button>
+            <div class="faq-answer px-4 text-xs text-gray-600 leading-relaxed">
+              <p class="pb-3">Open the order from <strong>Orders</strong> or find it under <strong>Messages</strong>. You can send text, photos and PDFs. Our team replies from the backend in the same chat.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Contact strip -->
+    <div class="mt-8 bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-100 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <div>
+        <p class="font-bold text-gray-900 text-sm">Still need help?</p>
+        <p class="text-xs text-gray-600 mt-0.5">Open Messages or your order chat — we reply from the backend.</p>
+      </div>
+      <div class="flex gap-2">
+        <a href="messages.html" class="bg-ali-orange text-white font-bold text-xs px-4 py-2.5 rounded-xl hover:bg-orange-600 transition">Messages</a>
+        <a href="orders.html" class="bg-white border border-gray-200 text-gray-700 font-bold text-xs px-4 py-2.5 rounded-xl hover:bg-gray-50 transition">My Orders</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom nav -->
+  <nav class="lg:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 py-2.5 px-6 flex justify-between items-center z-50">
+    <a href="index.html" class="flex flex-col items-center gap-0.5 text-gray-500">
+      <i data-lucide="home" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold">Home</span>
+    </a>
+    <a href="shop.html" class="flex flex-col items-center gap-0.5 text-gray-500">
+      <i data-lucide="layout-grid" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold">Categories</span>
+    </a>
+    <a href="messages.html" class="flex flex-col items-center gap-0.5 text-gray-500">
+      <i data-lucide="message-square" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold">Messages</span>
+    </a>
+    <a href="orders.html" class="flex flex-col items-center gap-0.5 text-gray-500">
+      <i data-lucide="clipboard-list" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold">Orders</span>
+    </a>
+    <a href="account.html" class="flex flex-col items-center gap-0.5 text-gray-500">
+      <i data-lucide="user" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold">Account</span>
+    </a>
+  </nav>
+
+  <script>
+    // Accordion
+    document.querySelectorAll('.faq-q').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.closest('.faq-item');
+        const wasOpen = item.classList.contains('open');
+        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+        if (!wasOpen) item.classList.add('open');
+      });
+    });
+
+    window.scrollToSection = function(id) {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    // Simple search filter
+    document.getElementById('help-search').addEventListener('input', function() {
+      const q = this.value.toLowerCase().trim();
+      document.querySelectorAll('.faq-item').forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = !q || text.includes(q) ? '' : 'none';
+      });
+      document.querySelectorAll('.faq-section').forEach(sec => {
+        const visible = [...sec.querySelectorAll('.faq-item')].some(i => i.style.display !== 'none');
+        sec.style.display = visible ? '' : 'none';
+      });
+    });
+
+    lucide.createIcons();
+  </script>
+</body>
+</html>
